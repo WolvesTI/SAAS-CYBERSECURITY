@@ -1,0 +1,3116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SECOPS - Suite de Ciberseguridad Empresarial</title>
+    
+    <!-- Fuentes Google: Space Grotesk (Tech) e Inter (Lectura) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Iconos Phosphor -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <style>
+        /* --- VARIABLES & RESET --- */
+        :root {
+            --bg-color: #050507;
+            --bg-secondary: #0f1014;
+            --bg-card: #141418;
+            --accent-blue: #2563eb;
+            --accent-cyan: #06b6d4;
+            --accent-glow: rgba(6, 182, 212, 0.4);
+            --text-main: #ffffff;
+            --text-muted: #9ca3af;
+            --text-dim: #6b7280;
+            --card-border: rgba(255, 255, 255, 0.08);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Space Grotesk', sans-serif;
+            line-height: 1.2;
+        }
+
+        /* --- BACKGROUND FX --- */
+        .grid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .glow-spot {
+            position: fixed;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(37, 99, 235, 0.12) 0%, rgba(6, 182, 212, 0.05) 40%, rgba(0,0,0,0) 70%);
+            top: -300px;
+            right: -200px;
+            z-index: -1;
+            border-radius: 50%;
+        }
+
+        .glow-spot-2 {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.08) 0%, rgba(0,0,0,0) 70%);
+            bottom: -200px;
+            left: -100px;
+            z-index: -1;
+            border-radius: 50%;
+        }
+
+        /* --- UI ELEMENTS --- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            color: white;
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 6px 25px rgba(6, 182, 212, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-main);
+            border: 1px solid var(--card-border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: var(--accent-cyan);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-muted);
+        }
+
+        .btn-ghost:hover {
+            color: var(--accent-cyan);
+            background: rgba(6, 182, 212, 0.1);
+        }
+
+        /* --- LOGIN SCREEN --- */
+        .login-screen {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            background: var(--bg-color);
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            padding: 40px;
+        }
+
+        .login-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 40px;
+        }
+
+        .login-logo i {
+            font-size: 2.5rem;
+            color: var(--accent-cyan);
+        }
+
+        .login-logo span {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text-main), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .login-title {
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 1.5rem;
+        }
+
+        .login-subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 32px;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-dim);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            margin-top: 10px;
+        }
+
+        .login-hint {
+            text-align: center;
+            margin-top: 24px;
+            padding: 16px;
+            background: rgba(6, 182, 212, 0.1);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .login-hint code {
+            color: var(--accent-cyan);
+            font-family: monospace;
+        }
+
+        /* --- MAIN APP LAYOUT --- */
+        .app-container {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .app-container.active {
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--card-border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 16px 12px;
+            overflow-y: auto;
+        }
+
+        .nav-section {
+            margin-bottom: 24px;
+        }
+
+        .nav-section-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 8px 12px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+            margin-bottom: 4px;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-main);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.2), rgba(6, 182, 212, 0.15));
+            color: var(--accent-cyan);
+            border-left: 3px solid var(--accent-cyan);
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid var(--card-border);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            min-height: 100vh;
+        }
+
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 32px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--card-border);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .page-info h1 {
+            font-size: 1.5rem;
+            margin-bottom: 4px;
+        }
+
+        .page-info p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .top-bar-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--success);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .notification-btn {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--card-border);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notification-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-main);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 18px;
+            height: 18px;
+            background: var(--danger);
+            border-radius: 50%;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Content Area */
+        .content-area {
+            padding: 32px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            border-color: rgba(6, 182, 212, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-icon.blue { background: rgba(37, 99, 235, 0.15); color: var(--accent-blue); }
+        .stat-icon.cyan { background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan); }
+        .stat-icon.green { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+        .stat-icon.red { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+        .stat-icon.yellow { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+        .stat-icon.purple { background: rgba(139, 92, 246, 0.15); color: #8b5cf6; }
+
+        .stat-content h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-content p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .stat-trend {
+            font-size: 0.75rem;
+            margin-top: 8px;
+        }
+
+        .stat-trend.up { color: var(--success); }
+        .stat-trend.down { color: var(--danger); }
+
+        /* Security Score Circle */
+        .score-circle {
+            width: 180px;
+            height: 180px;
+            position: relative;
+        }
+
+        .score-circle svg {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }
+
+        .score-circle circle {
+            fill: none;
+            stroke-width: 10;
+        }
+
+        .score-circle .bg {
+            stroke: var(--bg-secondary);
+        }
+
+        .score-circle .progress {
+            stroke: url(#scoreGradient);
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s ease;
+        }
+
+        .score-value {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .score-number {
+            font-size: 3rem;
+            font-weight: 700;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .score-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Charts */
+        .chart-container {
+            height: 200px;
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            padding: 20px 0;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: linear-gradient(to top, var(--accent-blue), var(--accent-cyan));
+            border-radius: 4px 4px 0 0;
+            position: relative;
+            min-height: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .chart-bar:hover {
+            opacity: 0.8;
+        }
+
+        .chart-bar::after {
+            content: attr(data-value);
+            position: absolute;
+            bottom: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: var(--text-dim);
+        }
+
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .data-table td {
+            padding: 16px;
+            border-bottom: 1px solid var(--card-border);
+            font-size: 0.9rem;
+        }
+
+        .data-table tr:hover td {
+            background: rgba(255,255,255,0.02);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge.critical { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+        .badge.high { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+        .badge.medium { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+        .badge.low { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+        .badge.info { background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan); }
+
+        /* Progress Bars */
+        .progress-bar {
+            height: 8px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-fill.blue { background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan)); }
+        .progress-fill.green { background: var(--success); }
+        .progress-fill.red { background: var(--danger); }
+        .progress-fill.yellow { background: var(--warning); }
+
+        /* Module Cards */
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .module-card {
+            background: var(--bg-card);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .module-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 10px 40px rgba(6, 182, 212, 0.1);
+        }
+
+        .module-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+        }
+
+        .module-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .module-card p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .module-stats {
+            display: flex;
+            gap: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--card-border);
+        }
+
+        .module-stat {
+            font-size: 0.8rem;
+        }
+
+        .module-stat span {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        /* Scanner */
+        .scanner-input {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .scanner-input input {
+            flex: 1;
+        }
+
+        .scan-progress {
+            display: none;
+            margin-top: 24px;
+        }
+
+        .scan-progress.active {
+            display: block;
+        }
+
+        .scan-status {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .scan-bar {
+            height: 6px;
+            background: var(--bg-secondary);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .scan-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        /* Vulnerabilities List */
+        .vuln-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .vuln-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 16px;
+            border-left: 4px solid;
+        }
+
+        .vuln-item.critical { border-left-color: var(--danger); }
+        .vuln-item.high { border-left-color: var(--warning); }
+        .vuln-item.medium { border-left-color: #3b82f6; }
+        .vuln-item.low { border-left-color: var(--success); }
+
+        .vuln-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .vuln-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .vuln-cvss {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .vuln-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .vuln-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Alerts */
+        .alerts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .alert-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            border-left: 3px solid;
+        }
+
+        .alert-item.critical { border-left-color: var(--danger); }
+        .alert-item.warning { border-left-color: var(--warning); }
+        .alert-item.info { border-left-color: var(--accent-cyan); }
+        .alert-item.success { border-left-color: var(--success); }
+
+        .alert-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .alert-item.critical .alert-icon { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+        .alert-item.warning .alert-icon { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+        .alert-item.info .alert-icon { background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan); }
+        .alert-item.success .alert-icon { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 2px;
+        }
+
+        .alert-time {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        /* Recommendations */
+        .rec-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .rec-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .rec-title {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .rec-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        /* Compliance */
+        .compliance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .compliance-card {
+            background: var(--bg-card);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .compliance-icon {
+            font-size: 2rem;
+            margin-bottom: 12px;
+        }
+
+        .compliance-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .compliance-status {
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .compliance-status.pass { color: var(--success); }
+        .compliance-status.fail { color: var(--danger); }
+        .compliance-status.pending { color: var(--warning); }
+
+        /* Settings */
+        .settings-section {
+            margin-bottom: 32px;
+        }
+
+        .settings-title {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+
+        .settings-info h4 {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .settings-info p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Toggle Switch */
+        .toggle {
+            position: relative;
+            width: 48px;
+            height: 26px;
+            background: var(--bg-secondary);
+            border-radius: 13px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle.active {
+            background: var(--accent-cyan);
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        .toggle.active::after {
+            transform: translateX(22px);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .scanner-input {
+                flex-direction: column;
+            }
+            .content-area {
+                padding: 20px;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .slide-up {
+            animation: slideUp 0.5s ease forwards;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Grid Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        @media (max-width: 1200px) {
+            .grid-3 { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .quick-action {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-action:hover {
+            background: rgba(6, 182, 212, 0.1);
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        /* Notifications Panel */
+        .notifications-panel {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 360px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            display: none;
+            z-index: 200;
+            margin-top: 8px;
+        }
+
+        .notifications-panel.active {
+            display: block;
+        }
+
+        .notifications-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notifications-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .notifications-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--card-border);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .notification-item:hover {
+            background: rgba(255,255,255,0.03);
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Type distribution bars */
+        .type-bar {
+            margin-bottom: 16px;
+        }
+
+        .type-bar-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+        }
+
+        .type-bar-track {
+            height: 6px;
+            background: var(--bg-secondary);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .type-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Effects -->
+    <div class="grid-bg"></div>
+    <div class="glow-spot"></div>
+    <div class="glow-spot-2"></div>
+
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-container">
+            <div class="login-logo">
+                <i class="ph ph-shield-check"></i>
+                <span>SECOPS</span>
+            </div>
+            
+            <h2 class="login-title">Bienvenido de nuevo</h2>
+            <p class="login-subtitle">Accede a tu panel de ciberseguridad</p>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">Correo electrónico</label>
+                    <input type="email" class="form-input" id="loginEmail" placeholder="admin@secops.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Contraseña</label>
+                    <input type="password" class="form-input" id="loginPassword" placeholder="••••••••••••" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary login-btn">
+                    <i class="ph ph-sign-in"></i>
+                    Iniciar Sesión
+                </button>
+            </form>
+            
+            <div class="login-hint">
+                <p>Credenciales por defecto:</p>
+                <p><code>admin@secops.com</code> / <code>secops2024</code></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div class="app-container" id="mainApp">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo" style="font-family: 'Space Grotesk'; font-size: 1.3rem; font-weight: 700;">
+                    <i class="ph ph-shield-check" style="color: var(--accent-cyan);"></i>
+                    SECOPS
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Principal</div>
+                    <div class="nav-item active" data-section="dashboard">
+                        <i class="ph ph-squares-four"></i>
+                        Dashboard
+                    </div>
+                    <div class="nav-item" data-section="modules">
+                        <i class="ph ph-app-window"></i>
+                        Módulos
+                    </div>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Seguridad</div>
+                    <div class="nav-item" data-section="scanner">
+                        <i class="ph ph-radar"></i>
+                        Escáner
+                    </div>
+                    <div class="nav-item" data-section="threats">
+                        <i class="ph ph-warning"></i>
+                        Amenazas
+                    </div>
+                    <div class="nav-item" data-section="incidents">
+                        <i class="ph ph-bug-beetle"></i>
+                        Incidentes
+                    </div>
+                    <div class="nav-item" data-section="firewall">
+                        <i class="ph ph-fire"></i>
+                        Firewall
+                    </div>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Gestión</div>
+                    <div class="nav-item" data-section="compliance">
+                        <i class="ph ph-file-check"></i>
+                        Compliance
+                    </div>
+                    <div class="nav-item" data-section="backup">
+                        <i class="ph ph-hard-drives"></i>
+                        Backup
+                    </div>
+                    <div class="nav-item" data-section="endpoints">
+                        <i class="ph ph-computer"></i>
+                        Endpoints
+                    </div>
+                    <div class="nav-item" data-section="network">
+                        <i class="ph ph-network"></i>
+                        Red
+                    </div>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Recursos</div>
+                    <div class="nav-item" data-section="recommendations">
+                        <i class="ph ph-lightbulb"></i>
+                        Recomendaciones
+                    </div>
+                    <div class="nav-item" data-section="training">
+                        <i class="ph ph-graduation-cap"></i>
+                        Capacitación
+                    </div>
+                    <div class="nav-item" data-section="reports">
+                        <i class="ph ph-file-text"></i>
+                        Informes
+                    </div>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Sistema</div>
+                    <div class="nav-item" data-section="settings">
+                        <i class="ph ph-gear"></i>
+                        Configuración
+                    </div>
+                </div>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">A</div>
+                    <div class="user-details">
+                        <div class="user-name">Admin</div>
+                        <div class="user-role">Administrador</div>
+                    </div>
+                    <button class="btn btn-ghost" onclick="logout()">
+                        <i class="ph ph-sign-out"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="page-info">
+                    <h1 id="pageTitle">Dashboard</h1>
+                    <p id="pageSubtitle">Resumen de seguridad de tu empresa</p>
+                </div>
+                
+                <div class="top-bar-actions">
+                    <div class="quick-actions">
+                        <button class="quick-action" onclick="quickScan()">
+                            <i class="ph ph-radar"></i>
+                            Escaneo Rápido
+                        </button>
+                        <button class="quick-action" onclick="generateReport()">
+                            <i class="ph ph-file-text"></i>
+                            Informe
+                        </button>
+                    </div>
+                    
+                    <div class="status-badge">
+                        <span class="status-dot"></span>
+                        Sistema Activo
+                    </div>
+                    
+                    <button class="notification-btn" onclick="toggleNotifications()">
+                        <i class="ph ph-bell" style="font-size: 1.2rem;"></i>
+                        <span class="notification-badge">5</span>
+                    </button>
+                    
+                    <!-- Notifications Panel -->
+                    <div class="notifications-panel" id="notificationsPanel">
+                        <div class="notifications-header">
+                            <h3>Notificaciones</h3>
+                            <button class="btn btn-ghost" style="padding: 4px 8px;">Marcar todo</button>
+                        </div>
+                        <div class="notifications-list" id="notificationsList">
+                            <!-- Notifications populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-area">
+                <!-- Dashboard Section -->
+                <section class="section active" id="dashboardSection">
+                    <!-- Stats -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon blue">
+                                <i class="ph ph-shield-warning"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="statVulnerabilities">24</h3>
+                                <p>Vulnerabilidades</p>
+                                <div class="stat-trend up"><i class="ph ph-arrow-up"></i> 12% vs semana anterior</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon red">
+                                <i class="ph ph-warning-circle"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="statThreats">7</h3>
+                                <p>Amenazas Activas</p>
+                                <div class="stat-trend down"><i class="ph ph-arrow-down"></i> 5% vs semana anterior</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon green">
+                                <i class="ph ph-shield-check"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="statProtected">156</h3>
+                                <p>Sistemas Protegidos</p>
+                                <div class="stat-trend up"><i class="ph ph-arrow-up"></i> 8 nuevos</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon cyan">
+                                <i class="ph ph-clock"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="statLastScan">2h</h3>
+                                <p>Último Escaneo</p>
+                                <div class="stat-trend">Hace 2 horas</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Charts Row -->
+                    <div class="grid-2" style="margin-bottom: 24px;">
+                        <!-- Security Score -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Puntuación de Seguridad</h3>
+                            </div>
+                            <div style="display: flex; align-items: center; justify-content: center; padding: 20px 0;">
+                                <div class="score-circle">
+                                    <svg viewBox="0 0 180 180">
+                                        <defs>
+                                            <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                <stop offset="0%" style="stop-color:var(--accent-blue)" />
+                                                <stop offset="100%" style="stop-color:var(--accent-cyan)" />
+                                            </linearGradient>
+                                        </defs>
+                                        <circle class="bg" cx="90" cy="90" r="80"/>
+                                        <circle class="progress" cx="90" cy="90" r="80" 
+                                            stroke-dasharray="502" stroke-dashoffset="120" id="scoreProgress"/>
+                                    </svg>
+                                    <div class="score-value">
+                                        <span class="score-number" id="securityScore" style="color: var(--success);">78</span>
+                                        <span class="score-label">/ 100</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; text-align: center; padding-top: 20px; border-top: 1px solid var(--card-border);">
+                                <div>
+                                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-blue);">156</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-dim);">Escaneos</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--success);">89%</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-dim);">Corregido</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--warning);">12</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-dim);">Pendiente</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Threat Activity -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Actividad de Amenazas</h3>
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">Últimos 7 días</span>
+                            </div>
+                            <div class="chart-container" id="threatChart">
+                                <div class="chart-bar" style="height: 40%;" data-value="12"></div>
+                                <div class="chart-bar" style="height: 65%;" data-value="24"></div>
+                                <div class="chart-bar" style="height: 30%;" data-value="8"></div>
+                                <div class="chart-bar" style="height: 85%;" data-value="35"></div>
+                                <div class="chart-bar" style="height: 55%;" data-value="18"></div>
+                                <div class="chart-bar" style="height: 45%;" data-value="15"></div>
+                                <div class="chart-bar" style="height: 25%;" data-value="6"></div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding-top: 24px; font-size: 0.75rem; color: var(--text-dim);">
+                                <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Alerts & Quick Actions -->
+                    <div class="grid-2">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Alertas Recientes</h3>
+                                <button class="btn btn-ghost" style="font-size: 0.8rem;">Ver todas</button>
+                            </div>
+                            <div class="alerts-list" id="alertsList">
+                                <!-- Alerts populated by JS -->
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Estado de Módulos</h3>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 12px;">
+                                <div class="settings-item" style="border: none; padding: 8px 0;">
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <div class="stat-icon cyan" style="width: 36px; height: 36px; font-size: 1rem;">
+                                            <i class="ph ph-radar"></i>
+                                        </div>
+                                        <div>
+                                            <div style="font-weight: 600; font-size: 0.9rem;">Escáner de Vulnerabilidades</div>
+                                            <div style="font-size: 0.75rem; color: var(--success);">Activo</div>
+                                        </div>
+                                    </div>
+                                    <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+                                </div>
+                                <div class="settings-item" style="border: none; padding: 8px 0;">
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <div class="stat-icon blue" style="width: 36px; height: 36px; font-size: 1rem;">
+                                            <i class="ph ph-fire"></i>
+                                        </div>
+                                        <div>
+                                            <div style="font-weight: 600; font-size: 0.9rem;">Firewall</div>
+                                            <div style="font-size: 0.75rem; color: var(--success);">Protegiendo</div>
+                                        </div>
+                                    </div>
+                                    <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+                                </div>
+                                <div class="settings-item" style="border: none; padding: 8px 0;">
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <div class="stat-icon green" style="width: 36px; height: 36px; font-size: 1rem;">
+                                            <i class="ph ph-hard-drives"></i>
+                                        </div>
+                                        <div>
+                                            <div style="font-weight: 600; font-size: 0.9rem;">Backup Automático</div>
+                                            <div style="font-size: 0.75rem; color: var(--success);">Último: hace 1h</div>
+                                        </div>
+                                    </div>
+                                    <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+                                </div>
+                                <div class="settings-item" style="border: none; padding: 8px 0;">
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <div class="stat-icon yellow" style="width: 36px; height: 36px; font-size: 1rem;">
+                                            <i class="ph ph-computer"></i>
+                                        </div>
+                                        <div>
+                                            <div style="font-weight: 600; font-size: 0.9rem;">Protección Endpoints</div>
+                                            <div style="font-size: 0.75rem; color: var(--warning);">45/48 activos</div>
+                                        </div>
+                                    </div>
+                                    <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Modules Section -->
+                <section class="section" id="modulesSection">
+                    <div class="card-header" style="margin-bottom: 24px;">
+                        <h2 style="font-size: 1.5rem;">Módulos de Seguridad</h2>
+                    </div>
+                    
+                    <div class="module-grid">
+                        <div class="module-card" onclick="navigateTo('scanner')">
+                            <div class="module-icon" style="background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan);">
+                                <i class="ph ph-radar"></i>
+                            </div>
+                            <h3>Escáner de Vulnerabilidades</h3>
+                            <p>Detección automática de vulnerabilidades en sistemas, aplicaciones y redes.</p>
+                            <div class="module-stats">
+                                <div class="module-stat">24 <span>vulnerabilidades</span></div>
+                                <div class="module-stat">3 <span>críticas</span></div>
+                            </div>
+                        </div>
+                        
+                        <div class="module-card" onclick="navigateTo('threats')">
+                            <div class="module-icon" style="background: rgba(239, 68, 68, 0.15); color: var(--danger);">
+                                <i class="ph ph-warning"></i>
+                            </div>
+                            <h3>Monitoreo de Amenazas</h3>
+                            <p>Detección en tiempo real de amenazas y ataques cibernéticos.</p>
+                            <div class="module-stats">
+                                <div class="module-stat">7 <span>activas</span></div>
+                                <div class="module-stat">156 <span>bloqueadas</span></div>
+                            </div>
+                        </div>
+                        
+                        <div class="module-card" onclick="navigateTo('firewall')">
+                            <div class="module-icon" style="background: rgba(37, 99, 235, 0.15); color: var(--accent-blue);">
+                                <i class="ph ph-fire"></i>
+                            </div>
+                            <h3>Gestión de Firewall</h3>
+                            <p>Configuración y monitoreo de reglas de firewall y políticas de red.</p>
+                            <div class="module-stats">
+                                <div class="module-stat">128 <span>reglas</span></div>
+                                <div class="module-stat">12 <span>políticas</span></div>
+                            </div>
+                        </div>
+                        
+                        <div class="module-card" onclick="navigateTo('compliance')">
+                            <div class="module-icon" style="background: rgba(16, 185, 129, 0.15); color: var(--success);">
+                                <i class="ph ph-file-check"></i>
+                            </div>
+                            <h3>Compliance & Auditoría</h3>
+                            <p>Cumplimiento de normativas ISO 27001, GDPR, HIPAA y más.</p>
+                            <div class="module-stats">
+                                <div class="module-stat">4 <span>normativas</span></div>
+                                <div class="module-stat">87% <span>cumplimiento</span></div>
+                            </div>
+                        </div>
+                        
+                        <div class="module-card" onclick="navigateTo('backup')">
+                            <div class="module-icon" style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6;">
+                                <i class="ph ph-hard-drives"></i>
+                            </div>
+                            <h3>Backup & Recuperación</h3>
+                            <p>Respaldo automático y planes de recuperación ante desastres.</p>
+                            <div class="module-stats">
+                                <div class="module-stat">12 <span>trabajos</span></div>
+                                <div class="module-stat">99.9% <span>disponible</span></div>
+                            </div>
+                        </div>
+                        
+                        <div class="module-card" onclick="navigateTo('endpoints')">
+                            <div class="module-icon" style="background: rgba(245, 158, 11, 0.15); color: var(--warning);">
+                                <i class="ph ph-computer"></i>
+                            </div>
+                            <h3>Protección de Endpoints</h3>
+                            <p>Antivirus, EDR y protección de dispositivos finales.</p>
+                            <div class="module-stats">
+                                <div class="module-stat">48 <span>dispositivos</span></div>
+                                <div class="module-stat">45 <span>protegidos</span></div>
+                            </div>
+                        </div>
+                        
+                        <div class="module-card" onclick="navigateTo('network')">
+                            <div class="module-icon" style="background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan);">
+                                <i class="ph ph-network"></i>
+                            </div>
+                            <h3>Seguridad de Red</h3>
+                            <p>Monitoreo de tráfico, IDS/IPS y segmentación de red.</p>
+                            <div class="module-stats">
+                                <div class="module-stat">8 <span>segmentos</span></div>
+                                <div class="module-stat">2 <span>alertas</span></div>
+                            </div>
+                        </div>
+                        
+                        <div class="module-card" onclick="navigateTo('training')">
+                            <div class="module-icon" style="background: rgba(16, 185, 129, 0.15); color: var(--success);">
+                                <i class="ph ph-graduation-cap"></i>
+                            </div>
+                            <h3>Capacitación & Awareness</h3>
+                            <p>Programas de formación en ciberseguridad para empleados.</p>
+                            <div class="module-stats">
+                                <div class="module-stat">24 <span>cursos</span></div>
+                                <div class="module-stat">78% <span>completado</span></div>
+                            </div>
+                        </div>
+                        
+                        <div class="module-card" onclick="navigateTo('incidents')">
+                            <div class="module-icon" style="background: rgba(239, 68, 68, 0.15); color: var(--danger);">
+                                <i class="ph ph-bug-beetle"></i>
+                            </div>
+                            <h3>Gestión de Incidentes</h3>
+                            <p>Protocolos de respuesta y contención ante incidentes de seguridad.</p>
+                            <div class="module-stats">
+                                <div class="module-stat">3 <span>abiertos</span></div>
+                                <div class="module-stat">12 <span>resueltos</span></div>
+                            </div>
+                        </div>
+                        
+                        <div class="module-card" onclick="navigateTo('reports')">
+                            <div class="module-icon" style="background: rgba(37, 99, 235, 0.15); color: var(--accent-blue);">
+                                <i class="ph ph-file-text"></i>
+                            </div>
+                            <h3>Informes & Analytics</h3>
+                            <p>Reportes detallados y análisis de métricas de seguridad.</p>
+                            <div class="module-stats">
+                                <div class="module-stat">8 <span>plantillas</span></div>
+                                <div class="module-stat">24 <span>informes</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Scanner Section -->
+                <section class="section" id="scannerSection">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon cyan">
+                                <i class="ph ph-radar"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Escáner</h3>
+                                <p>Detecta vulnerabilidades en tu infraestructura</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid-2">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Nuevo Escaneo</h3>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Objetivo (Dominio o IP)</label>
+                                <input type="text" class="form-input" id="scanTarget" placeholder="example.com o 192.168.1.1">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Tipo de Escaneo</label>
+                                <select class="form-input" id="scanType">
+                                    <option value="quick">Rápido (Puertos principales)</option>
+                                    <option value="full" selected>Completo (Todos los puertos)</option>
+                                    <option value="custom">Personalizado</option>
+                                    <option value="web">Aplicación Web</option>
+                                    <option value="network">Red Interna</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Opciones</label>
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 12px;">
+                                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--text-muted); cursor: pointer;">
+                                        <input type="checkbox" checked> Escaneo de puertos
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--text-muted); cursor: pointer;">
+                                        <input type="checkbox" checked> Detección de servicios
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--text-muted); cursor: pointer;">
+                                        <input type="checkbox" checked> Análisis SSL/TLS
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--text-muted); cursor: pointer;">
+                                        <input type="checkbox" checked> Detección de CMS
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--text-muted); cursor: pointer;">
+                                        <input type="checkbox"> Subdominios
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--text-muted); cursor: pointer;">
+                                        <input type="checkbox"> OWASP Top 10
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <button class="btn btn-primary" style="width: 100%; margin-top: 16px;" onclick="startScan()">
+                                <i class="ph ph-radar"></i>
+                                Iniciar Escaneo
+                            </button>
+                            
+                            <div class="scan-progress" id="scanProgress">
+                                <div class="scan-status">
+                                    <span id="scanStatus">Inicializando...</span>
+                                    <span id="scanPercent">0%</span>
+                                </div>
+                                <div class="scan-bar">
+                                    <div class="scan-bar-fill" id="scanBarFill" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Historial de Escaneos</h3>
+                            </div>
+                            <div id="scanHistory" style="display: flex; flex-direction: column; gap: 12px;">
+                                <!-- History populated by JS -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Scan Results -->
+                    <div class="card" style="margin-top: 24px; display: none;" id="scanResults">
+                        <div class="card-header">
+                            <h3 class="card-title">Resultados del Escaneo</h3>
+                            <span class="badge critical" id="resultsCount">0 hallazgos</span>
+                        </div>
+                        <div class="vuln-list" id="vulnList">
+                            <!-- Vulnerabilities populated by JS -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Threats Section -->
+                <section class="section" id="threatsSection">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon red">
+                                <i class="ph ph-radiation"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="threatCritical">3</h3>
+                                <p>Críticas</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon yellow">
+                                <i class="ph ph-warning"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="threatHigh">5</h3>
+                                <p>Altas</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon blue">
+                                <i class="ph ph-info"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="threatMedium">8</h3>
+                                <p>Medias</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon green">
+                                <i class="ph ph-check-circle"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3 id="threatLow">12</h3>
+                                <p>Bajas</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid-2">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Amenazas Activas</h3>
+                                <button class="btn btn-primary" style="padding: 8px 16px; font-size: 0.8rem;">
+                                    <i class="ph ph-play"></i>
+                                    Iniciar Respuesta
+                                </button>
+                            </div>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Severidad</th>
+                                        <th>Tipo</th>
+                                        <th>Origen</th>
+                                        <th>Estado</th>
+                                        <th>Tiempo</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="threatsTable">
+                                    <!-- Threats populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Distribución por Tipo</h3>
+                            </div>
+                            
+                            <div class="type-bar">
+                                <div class="type-bar-header">
+                                    <span>Malware</span>
+                                    <span style="color: var(--danger);">35%</span>
+                                </div>
+                                <div class="type-bar-track">
+                                    <div class="type-bar-fill" style="width: 35%; background: var(--danger);"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="type-bar">
+                                <div class="type-bar-header">
+                                    <span>Phishing</span>
+                                    <span style="color: var(--warning);">28%</span>
+                                </div>
+                                <div class="type-bar-track">
+                                    <div class="type-bar-fill" style="width: 28%; background: var(--warning);"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="type-bar">
+                                <div class="type-bar-header">
+                                    <span>DDoS</span>
+                                    <span style="color: #3b82f6;">20%</span>
+                                </div>
+                                <div class="type-bar-track">
+                                    <div class="type-bar-fill" style="width: 20%; background: #3b82f6;"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="type-bar">
+                                <div class="type-bar-header">
+                                    <span>Intrusión</span>
+                                    <span style="color: var(--accent-cyan);">17%</span>
+                                </div>
+                                <div class="type-bar-track">
+                                    <div class="type-bar-fill" style="width: 17%; background: var(--accent-cyan);"></div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--card-border);">
+                                <h4 style="font-size: 0.9rem; margin-bottom: 12px;">IPs Bloqueadas</h4>
+                                <div id="blockedIPs" style="display: flex; flex-direction: column; gap: 8px;">
+                                    <!-- Blocked IPs populated by JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Incidents Section -->
+                <section class="section" id="incidentsSection">
+                    <div class="card-header" style="margin-bottom: 24px;">
+                        <h2 style="font-size: 1.5rem;">Gestión de Incidentes</h2>
+                        <button class="btn btn-primary">
+                            <i class="ph ph-plus"></i>
+                            Nuevo Incidente
+                        </button>
+                    </div>
+                    
+                    <div class="card">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Tipo</th>
+                                    <th>Severidad</th>
+                                    <th>Estado</th>
+                                    <th>Detectado</th>
+                                    <th>Asignado a</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="incidentsTable">
+                                <!-- Incidents populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Firewall Section -->
+                <section class="section" id="firewallSection">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon blue">
+                                <i class="ph ph-fire"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>128</h3>
+                                <p>Reglas Activas</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon green">
+                                <i class="ph ph-shield-check"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>2,456</h3>
+                                <p>Paquetes Bloqueados Hoy</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon cyan">
+                                <i class="ph ph-globe"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>12</h3>
+                                <p>Zonas</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid-2">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Reglas de Firewall</h3>
+                                <button class="btn btn-primary" style="padding: 8px 16px;">
+                                    <i class="ph ph-plus"></i>
+                                    Nueva Regla
+                                </button>
+                            </div>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Tipo</th>
+                                        <th>Estado</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="firewallRules">
+                                    <!-- Rules populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Tráfico por Zona</h3>
+                            </div>
+                            <div id="zoneTraffic" style="display: flex; flex-direction: column; gap: 16px;">
+                                <!-- Zone traffic populated by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Compliance Section -->
+                <section class="section" id="complianceSection">
+                    <div class="compliance-grid">
+                        <div class="compliance-card">
+                            <div class="compliance-icon" style="color: var(--success);">
+                                <i class="ph ph-lock"></i>
+                            </div>
+                            <div class="compliance-name">ISO 27001</div>
+                            <div class="compliance-status pass">
+                                <i class="ph ph-check-circle"></i>
+                                92% Cumplimiento
+                            </div>
+                        </div>
+                        <div class="compliance-card">
+                            <div class="compliance-icon" style="color: var(--success);">
+                                <i class="ph ph-shield-check"></i>
+                            </div>
+                            <div class="compliance-name">GDPR</div>
+                            <div class="compliance-status pass">
+                                <i class="ph ph-check-circle"></i>
+                                88% Cumplimiento
+                            </div>
+                        </div>
+                        <div class="compliance-card">
+                            <div class="compliance-icon" style="color: var(--warning);">
+                                <i class="ph ph-heartbeat"></i>
+                            </div>
+                            <div class="compliance-name">HIPAA</div>
+                            <div class="compliance-status pending">
+                                <i class="ph ph-clock"></i>
+                                75% Cumplimiento
+                            </div>
+                        </div>
+                        <div class="compliance-card">
+                            <div class="compliance-icon" style="color: var(--success);">
+                                <i class="ph ph-credit-card"></i>
+                            </div>
+                            <div class="compliance-name">PCI-DSS</div>
+                            <div class="compliance-status pass">
+                                <i class="ph ph-check-circle"></i>
+                                95% Cumplimiento
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Auditorías Recientes</h3>
+                            <button class="btn btn-primary" style="padding: 8px 16px;">
+                                <i class="ph ph-play"></i>
+                                Nueva Auditoría
+                            </button>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Auditoría</th>
+                                    <th>Normativa</th>
+                                    <th>Estado</th>
+                                    <th>Resultado</th>
+                                    <th>Fecha</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="auditsTable">
+                                <!-- Audits populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Backup Section -->
+                <section class="section" id="backupSection">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon purple">
+                                <i class="ph ph-hard-drives"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>12</h3>
+                                <p>Trabajos de Backup</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon green">
+                                <i class="ph ph-check-circle"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>99.9%</h3>
+                                <p>Éxito de Backups</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon cyan">
+                                <i class="ph ph-database"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>2.4 TB</h3>
+                                <p>Almacenamiento Usado</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon blue">
+                                <i class="ph ph-clock"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>1h</h3>
+                                <p>Último Backup</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Trabajos de Backup</h3>
+                            <button class="btn btn-primary" style="padding: 8px 16px;">
+                                <i class="ph ph-plus"></i>
+                                Nuevo Trabajo
+                            </button>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Tipo</th>
+                                    <th>Frecuencia</th>
+                                    <th>Último</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="backupJobs">
+                                <!-- Backup jobs populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Endpoints Section -->
+                <section class="section" id="endpointsSection">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon yellow">
+                                <i class="ph ph-computer"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>48</h3>
+                                <p>Dispositivos Totales</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon green">
+                                <i class="ph ph-shield-check"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>45</h3>
+                                <p>Protegidos</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon red">
+                                <i class="ph ph-warning"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>3</h3>
+                                <p>Sin Protección</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon blue">
+                                <i class="ph ph-virus"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>0</h3>
+                                <p>Amenazas Detectadas</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Dispositivos Endpoints</h3>
+                            <button class="btn btn-primary" style="padding: 8px 16px;">
+                                <i class="ph ph-plus"></i>
+                                Agregar Dispositivo
+                            </button>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Dispositivo</th>
+                                    <th>Usuario</th>
+                                    <th>IP</th>
+                                    <th>Estado</th>
+                                    <th>Última vez</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="endpointsTable">
+                                <!-- Endpoints populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Network Section -->
+                <section class="section" id="networkSection">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon cyan">
+                                <i class="ph ph-network"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>8</h3>
+                                <p>Segmentos de Red</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon blue">
+                                <i class="ph ph-wifi-high"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>156</h3>
+                                <p>Dispositivos Conectados</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon red">
+                                <i class="ph ph-warning"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>2</h3>
+                                <p>Alertas de Red</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon green">
+                                <i class="ph ph-radar"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>99.9%</h3>
+                                <p>Disponibilidad</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid-2">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Segmentos de Red</h3>
+                            </div>
+                            <div id="networkSegments" style="display: flex; flex-direction: column; gap: 12px;">
+                                <!-- Segments populated by JS -->
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Top Dispositivos por Tráfico</h3>
+                            </div>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Dispositivo</th>
+                                        <th>Tráfico</th>
+                                        <th>Tipo</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="trafficTable">
+                                    <!-- Traffic populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Recommendations Section -->
+                <section class="section" id="recommendationsSection">
+                    <div class="card-header" style="margin-bottom: 24px;">
+                        <h2 style="font-size: 1.5rem;">Recomendaciones de Seguridad</h2>
+                    </div>
+                    
+                    <div class="grid-2">
+                        <div>
+                            <h3 style="font-size: 1.1rem; margin-bottom: 16px; color: var(--danger);">
+                                <i class="ph ph-warning" style="margin-right: 8px;"></i>
+                                Acciones Prioritarias
+                            </h3>
+                            <div id="priorityRecommendations">
+                                <!-- Priority recs populated by JS -->
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 style="font-size: 1.1rem; margin-bottom: 16px; color: var(--success);">
+                                <i class="ph ph-check-circle" style="margin-right: 8px;"></i>
+                                Mejores Prácticas
+                            </h3>
+                            <div id="bestPractices">
+                                <!-- Best practices populated by JS -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card" style="margin-top: 24px;">
+                        <div class="card-header">
+                            <h3 class="card-title">Todas las Recomendaciones</h3>
+                        </div>
+                        <div class="module-grid" id="allRecommendations">
+                            <!-- All recs populated by JS -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Training Section -->
+                <section class="section" id="trainingSection">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon green">
+                                <i class="ph ph-users"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>24</h3>
+                                <p>Empleados Inscritos</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon cyan">
+                                <i class="ph ph-book-open"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>78%</h3>
+                                <p>Cursos Completados</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon yellow">
+                                <i class="ph ph-trophy"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>18</h3>
+                                <p>Certificados</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon blue">
+                                <i class="ph ph-target"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>6.5</h3>
+                                <p>Phishing Simulado (Score)</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Cursos Disponibles</h3>
+                            <button class="btn btn-primary" style="padding: 8px 16px;">
+                                <i class="ph ph-plus"></i>
+                                Crear Curso
+                            </button>
+                        </div>
+                        <div class="module-grid" id="coursesList">
+                            <!-- Courses populated by JS -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Reports Section -->
+                <section class="section" id="reportsSection">
+                    <div class="card-header" style="margin-bottom: 24px;">
+                        <h2 style="font-size: 1.5rem;">Informes & Analytics</h2>
+                    </div>
+                    
+                    <div class="grid-3">
+                        <div class="card" style="cursor: pointer;">
+                            <i class="ph ph-file-pdf" style="font-size: 3rem; color: var(--danger); margin-bottom: 16px;"></i>
+                            <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Informe Mensual</h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">Resumen ejecutivo de seguridad - Diciembre 2024</p>
+                            <button class="btn btn-secondary" style="margin-top: 16px; width: 100%;">
+                                <i class="ph ph-download"></i>
+                                Descargar
+                            </button>
+                        </div>
+                        
+                        <div class="card" style="cursor: pointer;">
+                            <i class="ph ph-file-pdf" style="font-size: 3rem; color: var(--danger); margin-bottom: 16px;"></i>
+                            <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Análisis de Vulnerabilidades</h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">Reporte detallado de hallazgos - Q4 2024</p>
+                            <button class="btn btn-secondary" style="margin-top: 16px; width: 100%;">
+                                <i class="ph ph-download"></i>
+                                Descargar
+                            </button>
+                        </div>
+                        
+                        <div class="card" style="cursor: pointer;">
+                            <i class="ph ph-file-pdf" style="font-size: 3rem; color: var(--danger); margin-bottom: 16px;"></i>
+                            <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Estado de Compliance</h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">Auditorías y cumplimiento normativo</p>
+                            <button class="btn btn-secondary" style="margin-top: 16px; width: 100%;">
+                                <i class="ph ph-download"></i>
+                                Descargar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="card" style="margin-top: 24px;">
+                        <div class="card-header">
+                            <h3 class="card-title">Generar Nuevo Informe</h3>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
+                            <button class="btn btn-secondary" style="padding: 20px; flex-direction: column; height: auto;">
+                                <i class="ph ph-bug-beetle" style="font-size: 2rem; color: var(--accent-cyan);"></i>
+                                <span style="margin-top: 8px;">Vulnerabilidades</span>
+                            </button>
+                            <button class="btn btn-secondary" style="padding: 20px; flex-direction: column; height: auto;">
+                                <i class="ph ph-shield-check" style="font-size: 2rem; color: var(--success);"></i>
+                                <span style="margin-top: 8px;">Cumplimiento</span>
+                            </button>
+                            <button class="btn btn-secondary" style="padding: 20px; flex-direction: column; height: auto;">
+                                <i class="ph ph-chart-line-up" style="font-size: 2rem; color: var(--accent-blue);"></i>
+                                <span style="margin-top: 8px;">Análisis de Riesgos</span>
+                            </button>
+                            <button class="btn btn-secondary" style="padding: 20px; flex-direction: column; height: auto;">
+                                <i class="ph ph-file-text" style="font-size: 2rem; color: var(--warning);"></i>
+                                <span style="margin-top: 8px;">Reporte Ejecutivo</span>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Settings Section -->
+                <section class="section" id="settingsSection">
+                    <div class="grid-2">
+                        <div class="card">
+                            <div class="settings-section">
+                                <h3 class="settings-title">Configuración General</h3>
+                                
+                                <div class="settings-item">
+                                    <div class="settings-info">
+                                        <h4>Escaneo Automático</h4>
+                                        <p>Ejecutar escaneos programados</p>
+                                    </div>
+                                    <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+                                </div>
+                                
+                                <div class="settings-item">
+                                    <div class="settings-info">
+                                        <h4>Notificaciones Email</h4>
+                                        <p>Recibir alertas por correo</p>
+                                    </div>
+                                    <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+                                </div>
+                                
+                                <div class="settings-item">
+                                    <div class="settings-info">
+                                        <h4>Alertas en Tiempo Real</h4>
+                                        <p>Notificaciones instantáneas</p>
+                                    </div>
+                                    <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+                                </div>
+                                
+                                <div class="settings-item">
+                                    <div class="settings-info">
+                                        <h4>Registro de Actividad</h4>
+                                        <p>Guardar logs de todas las acciones</p>
+                                    </div>
+                                    <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="settings-section">
+                                <h3 class="settings-title">Parámetros de Seguridad</h3>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Nivel de Sensibilidad</label>
+                                    <select class="form-input">
+                                        <option>Conservador</option>
+                                        <option selected>Normal</option>
+                                        <option>Permisivo</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Frecuencia de Escaneo</label>
+                                    <select class="form-input">
+                                        <option>Diario</option>
+                                        <option selected>Semanal</option>
+                                        <option>Mensual</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Umbral de Alerta</label>
+                                    <select class="form-input">
+                                        <option>Muy Bajo (Todas las alertas)</option>
+                                        <option selected>Medio</option>
+                                        <option>Alto (Solo críticas)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="settings-section">
+                                <h3 class="settings-title">API & Integraciones</h3>
+                                
+                                <div style="background: var(--bg-secondary); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                        <span style="font-weight: 600;">API Key Principal</span>
+                                        <button class="btn btn-ghost" style="padding: 4px 8px;">
+                                            <i class="ph ph-copy"></i>
+                                        </button>
+                                    </div>
+                                    <code style="color: var(--text-muted); font-size: 0.85rem;">sk_live_••••••••••••••••••••</code>
+                                </div>
+                                
+                                <button class="btn btn-secondary" style="width: 100%;">
+                                    <i class="ph ph-plus"></i>
+                                    Generar Nueva Key
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="settings-section">
+                                <h3 class="settings-title">Zonas Protegidas</h3>
+                                
+                                <div id="protectedZones" style="display: flex; flex-direction: column; gap: 12px;">
+                                    <!-- Zones populated by JS -->
+                                </div>
+                                
+                                <button class="btn btn-secondary" style="width: 100%; margin-top: 16px;">
+                                    <i class="ph ph-plus"></i>
+                                    Agregar Zona
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // ==================== DATA ====================
+        
+        const alerts = [
+            { type: 'critical', title: 'Vulnerabilidad Crítica Detectada', message: 'CVE-2024-1234 - SQL Injection en servidor web', time: '2 min' },
+            { type: 'warning', title: 'Múltiples Intentos de Login', message: 'IP 185.234.xx.xx intentando acceso SSH', time: '15 min' },
+            { type: 'info', title: 'Escaneo Completado', message: 'Escaneo de example.com finalizado', time: '2h' },
+            { type: 'success', title: 'Parche Aplicado', message: 'Vulnerabilidad CVE-2024-5678 resuelta', time: '5h' },
+            { type: 'warning', title: 'Certificado SSL Expirando', message: 'ssl.example.com expira en 7 días', time: '1 día' }
+        ];
+
+        const vulnerabilities = [
+            { id: 'CVE-2024-1234', title: 'SQL Injection', severity: 'critical', cvss: 9.8, status: 'open', description: 'Inyección SQL en formulario de login' },
+            { id: 'CVE-2024-5678', title: 'XSS Reflejado', severity: 'high', cvss: 7.5, status: 'open', description: 'Cross-site scripting en panel de admin' },
+            { id: 'CVE-2024-9012', title: 'CSRF Missing', severity: 'medium', cvss: 6.1, status: 'open', description: 'Token CSRF no encontrado' },
+            { id: 'TLS-001', title: 'TLS 1.0 Habilitado', severity: 'high', cvss: 7.4, status: 'open', description: 'Protocolo TLS obsoleto detectado' },
+            { id: 'CVE-2024-3456', title: 'Path Traversal', severity: 'critical', cvss: 9.1, status: 'open', description: 'Traversal en sistema de archivos' }
+        ];
+
+        const threats = [
+            { id: 1, type: 'Malware', severity: 'critical', origin: '185.234.xx.xx', target: 'Web Server', status: 'active', time: '2 min' },
+            { id: 2, type: 'DDoS', severity: 'high', origin: '45.33.xx.xx', target: 'API Gateway', status: 'active', time: '15 min' },
+            { id: 3, type: 'Phishing', severity: 'medium', origin: '103.25.xx.xx', target: 'Mail Server', status: 'mitigated', time: '1h' },
+            { id: 4, type: 'Brute Force', severity: 'high', origin: '192.99.xx.xx', target: 'Login Portal', status: 'blocked', time: '3h' }
+        ];
+
+        const incidents = [
+            { id: 'INC-001', type: 'Malware', severity: 'critical', status: 'open', detected: '2024-01-15 14:30', assignee: 'Juan Pérez' },
+            { id: 'INC-002', type: 'Acceso No Autorizado', severity: 'high', status: 'investigating', detected: '2024-01-15 10:15', assignee: 'María García' },
+            { id: 'INC-003', type: 'Phishing', severity: 'medium', status: 'resolved', detected: '2024-01-14 09:00', assignee: 'Carlos López' }
+        ];
+
+        const firewallRules = [
+            { name: 'Allow HTTP/HTTPS', type: 'ALLOW', port: '80,443', source: 'ANY', status: 'active' },
+            { name: 'Block SSH Bruteforce', type: 'DENY', port: '22', source: '185.234.xx.xx', status: 'active' },
+            { name: 'Allow MySQL Internal', type: 'ALLOW', port: '3306', source: '10.0.0.0/8', status: 'active' },
+            { name: 'Block Telnet', type: 'DENY', port: '23', source: 'ANY', status: 'active' }
+        ];
+
+        const scanHistory = [
+            { target: 'example.com', type: 'Completo', date: 'Hoy, 14:30', status: 'completed', issues: 5 },
+            { target: 'api.example.com', type: 'Rápido', date: 'Hoy, 10:15', status: 'completed', issues: 2 },
+            { target: '192.168.1.1', type: 'Red', date: 'Ayer', status: 'completed', issues: 8 },
+            { target: 'mail.company.com', type: 'Web', date: 'Ayer, 18:00', status: 'completed', issues: 3 }
+        ];
+
+        const blockedIPs = [
+            { ip: '185.234.219.47', reason: 'Ataque DDoS', time: '5 min' },
+            { ip: '103.25.43.12', reason: 'Phishing', time: '1h' },
+            { ip: '45.33.87.23', reason: 'Brute Force', time: '3h' },
+            { ip: '192.99.178.5', reason: 'Port Scan', time: '6h' }
+        ];
+
+        const recommendations = [
+            { priority: 'high', title: 'Actualizar OpenSSL a versión 3.0.x', description: 'La versión actual tiene vulnerabilidades críticas conocidas', category: 'Software' },
+            { priority: 'high', title: 'Implementar WAF', description: 'Protección contra inyecciones SQL y XSS en aplicaciones web', category: 'Infraestructura' },
+            { priority: 'medium', title: 'Habilitar 2FA', description: 'Autenticación de dos factores para todos los administradores', category: 'Acceso' },
+            { priority: 'medium', title: 'Renovar Certificados SSL', description: '3 certificados expiran en los próximos 30 días', category: 'Certificados' },
+            { priority: 'low', title: 'Actualizar Política de Contraseñas', description: 'Longitud mínima de 14 caracteres', category: 'Acceso' }
+        ];
+
+        const bestPractices = [
+            { icon: 'ph-lock', title: 'Contraseñas Seguras', description: 'Mínimo 14 caracteres con mayúsculas, minúsculas, números y símbolos' },
+            { icon: 'ph-shield-check', title: 'MFA Habilitado', description: 'Autenticación multifactor activa en todas las cuentas críticas' },
+            { icon: 'ph-arrows-clockwise', title: 'Actualizaciones', description: 'Sistemas y aplicaciones siempre actualizados' },
+            { icon: 'ph-user-check', title: 'Principio de Mínimo Privilegio', description: 'Usuarios con solo los permisos necesarios' }
+        ];
+
+        const courses = [
+            { title: 'Fundamentos de Ciberseguridad', progress: 100, enrolled: 24 },
+            { title: 'Reconocimiento de Phishing', progress: 85, enrolled: 24 },
+            { title: 'Gestión de Contraseñas', progress: 72, enrolled: 20 },
+            { title: 'Seguridad en el Trabajo Remoto', progress: 60, enrolled: 18 }
+        ];
+
+        const zones = [
+            { name: 'Producción', ip: '10.0.1.0/24', status: 'active', devices: 45 },
+            { name: 'Desarrollo', ip: '10.0.2.0/24', status: 'active', devices: 28 },
+            { name: 'DMZ', ip: '10.0.0.0/24', status: 'active', devices: 12 },
+            { name: 'Invitados', ip: '10.0.10.0/24', status: 'active', devices: 35 }
+        ];
+
+        const endpoints = [
+            { name: 'PC-JPérez', user: 'Juan Pérez', ip: '10.0.1.45', status: 'protected', lastSeen: 'Ahora' },
+            { name: 'LAPTOP-MGarcía', user: 'María García', ip: '10.0.1.52', status: 'protected', lastSeen: 'Ahora' },
+            { name: 'PC-CLopez', user: 'Carlos López', ip: '10.0.1.38', status: 'warning', lastSeen: '1h' },
+            { name: 'SRV-DB01', user: 'Sistema', ip: '10.0.1.10', status: 'protected', lastSeen: 'Ahora' }
+        ];
+
+        const audits = [
+            { name: 'Auditoría ISO 27001', norm: 'ISO 27001', status: 'completed', result: '92%', date: '2024-01-10' },
+            { name: 'Revisión GDPR', norm: 'GDPR', status: 'completed', result: '88%', date: '2024-01-05' },
+            { name: 'Evaluación PCI', norm: 'PCI-DSS', status: 'in_progress', result: '-', date: '2024-01-15' }
+        ];
+
+        const backupJobs = [
+            { name: 'DB-Production', type: 'Incremental', frequency: 'Cada 6h', last: '1h ago', status: 'success' },
+            { name: 'Files-Share', type: 'Completo', frequency: 'Diario', last: '3h ago', status: 'success' },
+            { name: 'Config-Backup', type: 'Completo', frequency: 'Semanal', last: '2 días ago', status: 'success' },
+            { name: 'Logs-Archive', type: 'Completo', frequency: 'Mensual', last: '15 días ago', status: 'success' }
+        ];
+
+        // ==================== LOGIN ====================
+        
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (email === 'admin@secops.com' && password === 'secops2024') {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('mainApp').classList.add('active');
+                initApp();
+            } else {
+                alert('Credenciales incorrectas. Use admin@secops.com / secops2024');
+            }
+        });
+
+        function logout() {
+            document.getElementById('mainApp').classList.remove('active');
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('loginPassword').value = '';
+        }
+
+        // ==================== NAVIGATION ====================
+        
+        const navItems = document.querySelectorAll('.nav-item');
+        const sections = document.querySelectorAll('.section');
+        const pageTitles = {
+            dashboard: { title: 'Dashboard', subtitle: 'Resumen de seguridad de tu empresa' },
+            modules: { title: 'Módulos', subtitle: 'Todas las herramientas de seguridad' },
+            scanner: { title: 'Escáner', subtitle: 'Detección de vulnerabilidades' },
+            threats: { title: 'Amenazas', subtitle: 'Monitoreo de amenazas en tiempo real' },
+            incidents: { title: 'Incidentes', subtitle: 'Gestión de incidentes de seguridad' },
+            firewall: { title: 'Firewall', subtitle: 'Configuración y reglas' },
+            compliance: { title: 'Compliance', subtitle: 'Cumplimiento normativo' },
+            backup: { title: 'Backup', subtitle: 'Respaldo y recuperación' },
+            endpoints: { title: 'Endpoints', subtitle: 'Protección de dispositivos' },
+            network: { title: 'Red', subtitle: 'Seguridad de red' },
+            recommendations: { title: 'Recomendaciones', subtitle: 'Sugerencias de seguridad' },
+            training: { title: 'Capacitación', subtitle: 'Programas de formación' },
+            reports: { title: 'Informes', subtitle: 'Reportes y analytics' },
+            settings: { title: 'Configuración', subtitle: 'Ajustes del sistema' }
+        };
+
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const section = this.dataset.section;
+                navigateTo(section);
+            });
+        });
+
+        function navigateTo(section) {
+            navItems.forEach(nav => nav.classList.remove('active'));
+            document.querySelector(`[data-section="${section}"]`).classList.add('active');
+            
+            sections.forEach(sec => sec.classList.remove('active'));
+            document.getElementById(section + 'Section').classList.add('active');
+            
+            document.getElementById('pageTitle').textContent = pageTitles[section].title;
+            document.getElementById('pageSubtitle').textContent = pageTitles[section].subtitle;
+        }
+
+        // ==================== INITIALIZE ====================
+        
+        function initApp() {
+            renderAlerts();
+            renderScanHistory();
+            renderThreats();
+            renderIncidents();
+            renderFirewallRules();
+            renderRecommendations();
+            renderCourses();
+            renderZones();
+            renderEndpoints();
+            renderAudits();
+            renderBackupJobs();
+            renderNetworkSegments();
+            renderProtectedZones();
+            setupNotifications();
+        }
+
+        // ==================== RENDER FUNCTIONS ====================
+        
+        function renderAlerts() {
+            const container = document.getElementById('alertsList');
+            container.innerHTML = alerts.map(alert => `
+                <div class="alert-item ${alert.type}">
+                    <div class="alert-icon">
+                        <i class="ph ${alert.type === 'critical' ? 'ph-warning' : alert.type === 'warning' ? 'ph-warning-circle' : alert.type === 'success' ? 'ph-check-circle' : 'ph-info'}"></i>
+                    </div>
+                    <div class="alert-content">
+                        <div class="alert-title">${alert.title}</div>
+                        <div class="alert-time">${alert.time}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderScanHistory() {
+            const container = document.getElementById('scanHistory');
+            container.innerHTML = scanHistory.map(scan => `
+                <div style="background: var(--bg-secondary); padding: 16px; border-radius: 8px; cursor: pointer; transition: all 0.2s;" class="hover:bg-opacity-50">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 600; font-size: 0.9rem;">${scan.target}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">${scan.type} • ${scan.date}</div>
+                        </div>
+                        <span class="badge ${scan.issues > 5 ? 'high' : 'low'}">${scan.issues} issues</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderThreats() {
+            const table = document.getElementById('threatsTable');
+            table.innerHTML = threats.map(threat => `
+                <tr>
+                    <td><span class="badge ${threat.severity}">${threat.severity.toUpperCase()}</span></td>
+                    <td>${threat.type}</td>
+                    <td style="color: var(--text-muted); font-family: monospace;">${threat.origin}</td>
+                    <td><span class="badge ${threat.status === 'active' ? 'critical' : threat.status === 'blocked' ? 'low' : 'medium'}">${threat.status}</span></td>
+                    <td style="color: var(--text-muted);">${threat.time}</td>
+                    <td>
+                        <button class="btn btn-ghost" style="padding: 4px 8px;"><i class="ph ph-eye"></i></button>
+                        <button class="btn btn-ghost" style="padding: 4px 8px; color: var(--danger);"><i class="ph ph-ban"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+
+            const blockedContainer = document.getElementById('blockedIPs');
+            blockedContainer.innerHTML = blockedIPs.map(ip => `
+                <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: 12px; border-radius: 8px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <i class="ph ph-ban" style="color: var(--danger);"></i>
+                        <div>
+                            <div style="font-family: monospace; font-size: 0.85rem;">${ip.ip}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">${ip.reason}</div>
+                        </div>
+                    </div>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">${ip.time}</span>
+                </div>
+            `).join('');
+        }
+
+        function renderIncidents() {
+            const table = document.getElementById('incidentsTable');
+            table.innerHTML = incidents.map(inc => `
+                <tr>
+                    <td style="font-weight: 600;">${inc.id}</td>
+                    <td>${inc.type}</td>
+                    <td><span class="badge ${inc.severity}">${inc.severity.toUpperCase()}</span></td>
+                    <td><span class="badge ${inc.status === 'open' ? 'critical' : inc.status === 'resolved' ? 'low' : 'medium'}">${inc.status}</span></td>
+                    <td style="color: var(--text-muted);">${inc.detected}</td>
+                    <td>${inc.assignee}</td>
+                    <td>
+                        <button class="btn btn-ghost" style="padding: 4px 8px;"><i class="ph ph-eye"></i></button>
+                        <button class="btn btn-ghost" style="padding: 4px 8px;"><i class="ph ph-pencil"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderFirewallRules() {
+            const table = document.getElementById('firewallRules');
+            table.innerHTML = firewallRules.map(rule => `
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <i class="ph ${rule.type === 'ALLOW' ? 'ph-check-circle' : 'ph-x-circle'}" style="color: ${rule.type === 'ALLOW' ? 'var(--success)' : 'var(--danger)'}"></i>
+                            ${rule.name}
+                        </div>
+                    </td>
+                    <td style="font-family: monospace; font-size: 0.85rem;">${rule.port}</td>
+                    <td><span class="badge ${rule.status === 'active' ? 'low' : 'medium'}">${rule.status}</span></td>
+                    <td>
+                        <button class="btn btn-ghost" style="padding: 4px 8px;"><i class="ph ph-pencil"></i></button>
+                        <button class="btn btn-ghost" style="padding: 4px 8px; color: var(--danger);"><i class="ph ph-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderRecommendations() {
+            const priority = document.getElementById('priorityRecommendations');
+            priority.innerHTML = recommendations.filter(r => r.priority === 'high' || r.priority === 'medium').map(rec => `
+                <div class="rec-card">
+                    <div class="rec-header">
+                        <span class="rec-title">${rec.title}</span>
+                        <span class="badge ${rec.priority}">${rec.priority}</span>
+                    </div>
+                    <p class="rec-desc">${rec.description}</p>
+                    <button class="btn btn-primary" style="padding: 8px 16px; font-size: 0.8rem;">Aplicar</button>
+                </div>
+            `).join('');
+
+            const practices = document.getElementById('bestPractices');
+            practices.innerHTML = bestPractices.map(p => `
+                <div style="display: flex; gap: 16px; margin-bottom: 16px;">
+                    <div style="width: 40px; height: 40px; background: rgba(16, 185, 129, 0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <i class="ph ${p.icon}" style="color: var(--success); font-size: 1.2rem;"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 4px;">${p.title}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">${p.description}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            const all = document.getElementById('allRecommendations');
+            all.innerHTML = recommendations.map(rec => `
+                <div class="card" style="padding: 20px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                        <span class="badge ${rec.priority}">${rec.priority}</span>
+                        <span style="font-size: 0.75rem; color: var(--text-muted);">${rec.category}</span>
+                    </div>
+                    <h4 style="font-weight: 600; margin-bottom: 8px;">${rec.title}</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">${rec.description}</p>
+                    <button class="btn btn-primary" style="width: 100%; padding: 8px;">Implementar</button>
+                </div>
+            `).join('');
+        }
+
+        function renderCourses() {
+            const container = document.getElementById('coursesList');
+            container.innerHTML = courses.map(course => `
+                <div class="card" style="padding: 20px;">
+                    <h4 style="font-weight: 600; margin-bottom: 12px;">${course.title}</h4>
+                    <div style="margin-bottom: 8px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 4px;">
+                            <span style="color: var(--text-muted);">Progreso</span>
+                            <span>${course.progress}%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill blue" style="width: ${course.progress}%;"></div>
+                        </div>
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">
+                        <i class="ph ph-users"></i> ${course.enrolled} inscritos
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderZones() {
+            const container = document.getElementById('zoneTraffic');
+            container.innerHTML = zones.map(zone => `
+                <div style="background: var(--bg-secondary); padding: 16px; border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <div style="font-weight: 600;">${zone.name}</div>
+                        <span class="badge low">active</span>
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); font-family: monospace;">${zone.ip}</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">${zone.devices} dispositivos</div>
+                </div>
+            `).join('');
+        }
+
+        function renderEndpoints() {
+            const table = document.getElementById('endpointsTable');
+            table.innerHTML = endpoints.map(ep => `
+                <tr>
+                    <td style="font-weight: 600;">${ep.name}</td>
+                    <td>${ep.user}</td>
+                    <td style="font-family: monospace; color: var(--text-muted);">${ep.ip}</td>
+                    <td><span class="badge ${ep.status === 'protected' ? 'low' : 'warning'}">${ep.status}</span></td>
+                    <td style="color: var(--text-muted);">${ep.lastSeen}</td>
+                    <td>
+                        <button class="btn btn-ghost" style="padding: 4px 8px;"><i class="ph ph-shield"></i></button>
+                        <button class="btn btn-ghost" style="padding: 4px 8px;"><i class="ph ph-gear"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderAudits() {
+            const table = document.getElementById('auditsTable');
+            table.innerHTML = audits.map(audit => `
+                <tr>
+                    <td style="font-weight: 600;">${audit.name}</td>
+                    <td>${audit.norm}</td>
+                    <td><span class="badge ${audit.status === 'completed' ? 'low' : 'medium'}">${audit.status}</span></td>
+                    <td style="font-weight: 600; color: ${audit.result !== '-' ? 'var(--success)' : 'var(--text-muted)'};">${audit.result}</td>
+                    <td style="color: var(--text-muted);">${audit.date}</td>
+                    <td>
+                        <button class="btn btn-ghost" style="padding: 4px 8px;"><i class="ph ph-eye"></i></button>
+                        <button class="btn btn-ghost" style="padding: 4px 8px;"><i class="ph ph-download"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderBackupJobs() {
+            const table = document.getElementById('backupJobs');
+            table.innerHTML = backupJobs.map(job => `
+                <tr>
+                    <td style="font-weight: 600;">${job.name}</td>
+                    <td>${job.type}</td>
+                    <td>${job.frequency}</td>
+                    <td style="color: var(--text-muted);">${job.last}</td>
+                    <td><span class="badge ${job.status === 'success' ? 'low' : 'critical'}">${job.status}</span></td>
+                    <td>
+                        <button class="btn btn-ghost" style="padding: 4px 8px;"><i class="ph ph-play"></i></button>
+                        <button class="btn btn-ghost" style="padding: 4px 8px;"><i class="ph ph-gear"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderNetworkSegments() {
+            const container = document.getElementById('networkSegments');
+            container.innerHTML = zones.map(zone => `
+                <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: 16px; border-radius: 8px;">
+                    <div>
+                        <div style="font-weight: 600;">${zone.name}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); font-family: monospace;">${zone.ip}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-weight: 600;">${zone.devices}</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">dispositivos</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderProtectedZones() {
+            const container = document.getElementById('protectedZones');
+            container.innerHTML = zones.map(zone => `
+                <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: 12px; border-radius: 8px;">
+                    <div>
+                        <div style="font-weight: 600; font-size: 0.9rem;">${zone.name}</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted); font-family: monospace;">${zone.ip}</div>
+                    </div>
+                    <span class="badge low">${zone.status}</span>
+                </div>
+            `).join('');
+        }
+
+        // ==================== NOTIFICATIONS ====================
+        
+        function setupNotifications() {
+            const list = document.getElementById('notificationsList');
+            list.innerHTML = alerts.map(alert => `
+                <div class="notification-item">
+                    <div style="display: flex; gap: 12px;">
+                        <div class="alert-icon" style="width: 32px; height: 32px;">
+                            <i class="ph ${alert.type === 'critical' ? 'ph-warning' : alert.type === 'warning' ? 'ph-warning-circle' : alert.type === 'success' ? 'ph-check-circle' : 'ph-info'}"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight: 600; font-size: 0.9rem;">${alert.title}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">${alert.message}</div>
+                            <div style="font-size: 0.7rem; color: var(--text-dim); margin-top: 4px;">${alert.time}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleNotifications() {
+            document.getElementById('notificationsPanel').classList.toggle('active');
+        }
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.notification-btn') && !e.target.closest('.notifications-panel')) {
+                document.getElementById('notificationsPanel').classList.remove('active');
+            }
+        });
+
+        // ==================== SCANNER ====================
+        
+        function startScan() {
+            const target = document.getElementById('scanTarget').value || 'example.com';
+            const progress = document.getElementById('scanProgress');
+            const barFill = document.getElementById('scanBarFill');
+            const percent = document.getElementById('scanPercent');
+            const status = document.getElementById('scanStatus');
+            const results = document.getElementById('scanResults');
+            const vulnList = document.getElementById('vulnList');
+            const resultsCount = document.getElementById('resultsCount');
+
+            progress.classList.add('active');
+            results.style.display = 'none';
+
+            let percentValue = 0;
+            const steps = [
+                'Inicializando escáner...',
+                'Resolviendo DNS...',
+                'Escaneando puertos...',
+                'Detectando servicios...',
+                'Analizando SSL/TLS...',
+                'Buscando vulnerabilidades...',
+                'Generando informe...',
+                'Completado'
+            ];
+            let step = 0;
+
+            const interval = setInterval(() => {
+                percentValue += Math.random() * 15;
+                if (percentValue >= 100) {
+                    percentValue = 100;
+                    clearInterval(interval);
+                    
+                    setTimeout(() => {
+                        progress.classList.remove('active');
+                        results.style.display = 'block';
+                        resultsCount.textContent = `${vulnerabilities.length} hallazgos`;
+                        
+                        vulnList.innerHTML = vulnerabilities.map(v => `
+                            <div class="vuln-item ${v.severity}">
+                                <div class="vuln-header">
+                                    <span class="vuln-title">${v.id}: ${v.title}</span>
+                                    <span class="vuln-cvss">CVSS: ${v.cvss}</span>
+                                </div>
+                                <p class="vuln-desc">${v.description}</p>
+                                <div class="vuln-actions">
+                                    <span class="badge ${v.severity}">${v.severity}</span>
+                                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.75rem;">Detalles</button>
+                                    <button class="btn btn-primary" style="padding: 6px 12px; font-size: 0.75rem;">Marcar</button>
+                                </div>
+                            </div>
+                        `).join('');
+                    }, 500);
+                }
+
+                barFill.style.width = percentValue + '%';
+                percent.textContent = Math.round(percentValue) + '%';
+                if (step < steps.length - 1 && percentValue > (step + 1) * 12.5) {
+                    step++;
+                }
+                status.textContent = steps[step];
+            }, 300);
+        }
+
+        // ==================== QUICK ACTIONS ====================
+        
+        function quickScan() {
+            navigateTo('scanner');
+            document.getElementById('scanTarget').value = 'empresa.com';
+        }
+
+        function generateReport() {
+            navigateTo('reports');
+        }
+
+        // Simulate real-time updates
+        setInterval(() => {
+            const threatCount = Math.floor(Math.random() * 5) + 3;
+            document.getElementById('statThreats').textContent = threatCount;
+            document.getElementById('threatCritical').textContent = Math.max(1, threatCount - 4);
+            document.getElementById('threatHigh').textContent = Math.max(1, threatCount - 2);
+        }, 30000);
+    </script>
+</body>
+</html>

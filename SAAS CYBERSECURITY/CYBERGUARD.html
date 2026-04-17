@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberGuard - SaaS de Ciberseguridad</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+        .card-gradient { background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%); }
+        .glow { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
+        .pulse-dot { animation: pulse 2s infinite; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .scan-line {
+            animation: scan 2s linear infinite;
+        }
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+        .threat-level-low { background: #22c55e; }
+        .threat-level-medium { background: #eab308; }
+        .threat-level-high { background: #f97316; }
+        .threat-level-critical { background: #ef4444; }
+        .sidebar-item:hover { background: rgba(59, 130, 246, 0.1); }
+        .sidebar-item.active { background: rgba(59, 130, 246, 0.2); border-left: 3px solid #3b82f6; }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-white">
+    <!-- Login Screen -->
+    <div id="loginScreen" class="fixed inset-0 z-50 flex items-center justify-center gradient-bg">
+        <div class="card-gradient p-8 rounded-2xl border border-slate-700 shadow-2xl w-full max-w-md">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-shield-halved text-3xl"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-white">CyberGuard</h1>
+                <p class="text-slate-400 mt-2">Plataforma de Ciberseguridad</p>
+            </div>
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Email</label>
+                    <input type="email" id="loginEmail" class="w-full px-4 py-3 bg-slate-800 border border-slate-600 rounded-lg focus:outline-none focus:border-blue-500 text-white" placeholder="admin@cyberguard.com" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Contraseña</label>
+                    <input type="password" id="loginPassword" class="w-full px-4 py-3 bg-slate-800 border border-slate-600 rounded-lg focus:outline-none focus:border-blue-500 text-white" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold transition-all">
+                    Iniciar Sesión
+                </button>
+            </form>
+            <p class="text-center text-slate-400 mt-6 text-sm">Demo: admin@cyberguard.com / admin123</p>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" class="hidden flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col">
+            <div class="p-6 border-b border-slate-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-shield-halved"></i>
+                    </div>
+                    <span class="text-xl font-bold">CyberGuard</span>
+                </div>
+            </div>
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="#" class="sidebar-item active flex items-center gap-3 px-4 py-3 rounded-lg text-white transition-all" data-section="dashboard">
+                    <i class="fas fa-chart-line w-5"></i>
+                    Dashboard
+                </a>
+                <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 transition-all" data-section="scanner">
+                    <i class="fas fa-radar w-5"></i>
+                    Escáner
+                </a>
+                <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 transition-all" data-section="threats">
+                    <i class="fas fa-skull-crossbones w-5"></i>
+                    Amenazas
+                </a>
+                <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 transition-all" data-section="recommendations">
+                    <i class="fas fa-lightbulb w-5"></i>
+                    Recomendaciones
+                </a>
+                <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 transition-all" data-section="reports">
+                    <i class="fas fa-file-alt w-5"></i>
+                    Informes
+                </a>
+                <a href="#" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 transition-all" data-section="settings">
+                    <i class="fas fa-cog w-5"></i>
+                    Configuración
+                </a>
+            </nav>
+            <div class="p-4 border-t border-slate-800">
+                <div class="flex items-center gap-3 px-4 py-2">
+                    <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-sm font-bold">A</div>
+                    <div>
+                        <p class="text-sm font-medium">Admin User</p>
+                        <p class="text-xs text-slate-400">admin@cyberguard.com</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto">
+            <!-- Header -->
+            <header class="bg-slate-900 border-b border-slate-800 px-8 py-4 flex items-center justify-between">
+                <div>
+                    <h2 id="pageTitle" class="text-2xl font-bold">Dashboard</h2>
+                    <p id="pageSubtitle" class="text-slate-400 text-sm">Resumen de tu seguridad</p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="relative">
+                        <button id="notificationBtn" class="relative p-2 text-slate-400 hover:text-white transition-colors">
+                            <i class="fas fa-bell text-xl"></i>
+                            <span id="notificationBadge" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-xs flex items-center justify-center">3</span>
+                        </button>
+                        <!-- Notifications Panel -->
+                        <div id="notificationsPanel" class="hidden absolute right-0 top-12 w-80 bg-slate-800 border border-slate-700 rounded-lg shadow-xl z-50">
+                            <div class="p-4 border-b border-slate-700">
+                                <h3 class="font-semibold">Notificaciones</h3>
+                            </div>
+                            <div id="notificationsList" class="max-h-80 overflow-y-auto">
+                                <!-- Notifications will be added here -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 px-3 py-1 bg-green-500/20 rounded-full">
+                        <span class="w-2 h-2 bg-green-500 rounded-full pulse-dot"></span>
+                        <span class="text-sm text-green-400">Sistema Activo</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Sections -->
+            <div class="p-8">
+                <!-- Dashboard Section -->
+                <section id="dashboardSection" class="section">
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="card-gradient p-6 rounded-xl border border-slate-700">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="w-12 h-12 bg-blue-600/20 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-shield-virus text-blue-500 text-xl"></i>
+                                </div>
+                                <span class="text-green-400 text-sm"><i class="fas fa-arrow-up"></i> 12%</span>
+                            </div>
+                            <h3 class="text-3xl font-bold" id="statVulnerabilities">24</h3>
+                            <p class="text-slate-400 text-sm">Vulnerabilidades</p>
+                        </div>
+                        <div class="card-gradient p-6 rounded-xl border border-slate-700">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="w-12 h-12 bg-red-600/20 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-exclamation-triangle text-red-500 text-xl"></i>
+                                </div>
+                                <span class="text-red-400 text-sm"><i class="fas fa-arrow-up"></i> 8%</span>
+                            </div>
+                            <h3 class="text-3xl font-bold" id="statThreats">7</h3>
+                            <p class="text-slate-400 text-sm">Amenazas Activas</p>
+                        </div>
+                        <div class="card-gradient p-6 rounded-xl border border-slate-700">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="w-12 h-12 bg-green-600/20 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-check-circle text-green-500 text-xl"></i>
+                                </div>
+                                <span class="text-green-400 text-sm"><i class="fas fa-arrow-up"></i> 95%</span>
+                            </div>
+                            <h3 class="text-3xl font-bold" id="statProtected">98%</h3>
+                            <p class="text-slate-400 text-sm">Sistemas Protegidos</p>
+                        </div>
+                        <div class="card-gradient p-6 rounded-xl border border-slate-700">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="w-12 h-12 bg-purple-600/20 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-clock text-purple-500 text-xl"></i>
+                                </div>
+                                <span class="text-blue-400 text-sm">Hoy</span>
+                            </div>
+                            <h3 class="text-3xl font-bold" id="statLastScan">2h</h3>
+                            <p class="text-slate-400 text-sm">Último Escaneo</p>
+                        </div>
+                    </div>
+
+                    <!-- Charts Row -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                        <!-- Security Score -->
+                        <div class="card-gradient p-6 rounded-xl border border-slate-700">
+                            <h3 class="text-lg font-semibold mb-6">Puntuación de Seguridad</h3>
+                            <div class="flex items-center justify-center">
+                                <div class="relative w-40 h-40">
+                                    <svg class="w-full h-full transform -rotate-90">
+                                        <circle cx="80" cy="80" r="70" fill="none" stroke="#334155" stroke-width="12"/>
+                                        <circle id="securityCircle" cx="80" cy="80" r="70" fill="none" stroke="#22c55e" stroke-width="12" stroke-dasharray="440" stroke-dashoffset="44" stroke-linecap="round"/>
+                                    </svg>
+                                    <div class="absolute inset-0 flex items-center justify-center flex-col">
+                                        <span id="securityScore" class="text-4xl font-bold text-green-400">78</span>
+                                        <span class="text-slate-400 text-sm">/ 100</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-6 grid grid-cols-3 gap-4 text-center">
+                                <div>
+                                    <p class="text-2xl font-bold text-blue-400">156</p>
+                                    <p class="text-xs text-slate-400">Escaneos</p>
+                                </div>
+                                <div>
+                                    <p class="text-2xl font-bold text-green-400">89%</p>
+                                    <p class="text-xs text-slate-400">Corregido</p>
+                                </div>
+                                <div>
+                                    <p class="text-2xl font-bold text-purple-400">12</p>
+                                    <p class="text-xs text-slate-400">Pendiente</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Threat Timeline -->
+                        <div class="card-gradient p-6 rounded-xl border border-slate-700">
+                            <h3 class="text-lg font-semibold mb-6">Actividad de Amenazas (7 días)</h3>
+                            <div class="flex items-end justify-between h-40 gap-2">
+                                <div class="flex-1 bg-slate-700 rounded-t relative" style="height: 40%">
+                                    <div class="absolute bottom-0 w-full bg-blue-500 rounded-t text-xs text-center py-1">12</div>
+                                </div>
+                                <div class="flex-1 bg-slate-700 rounded-t relative" style="height: 65%">
+                                    <div class="absolute bottom-0 w-full bg-yellow-500 rounded-t text-xs text-center py-1">24</div>
+                                </div>
+                                <div class="flex-1 bg-slate-700 rounded-t relative" style="height: 30%">
+                                    <div class="absolute bottom-0 w-full bg-green-500 rounded-t text-xs text-center py-1">8</div>
+                                </div>
+                                <div class="flex-1 bg-slate-700 rounded-t relative" style="height: 80%">
+                                    <div class="absolute bottom-0 w-full bg-red-500 rounded-t text-xs text-center py-1">35</div>
+                                </div>
+                                <div class="flex-1 bg-slate-700 rounded-t relative" style="height: 55%">
+                                    <div class="absolute bottom-0 w-full bg-blue-500 rounded-t text-xs text-center py-1">18</div>
+                                </div>
+                                <div class="flex-1 bg-slate-700 rounded-t relative" style="height: 45%">
+                                    <div class="absolute bottom-0 w-full bg-green-500 rounded-t text-xs text-center py-1">15</div>
+                                </div>
+                                <div class="flex-1 bg-slate-700 rounded-t relative" style="height: 25%">
+                                    <div class="absolute bottom-0 w-full bg-green-500 rounded-t text-xs text-center py-1">6</div>
+                                </div>
+                            </div>
+                            <div class="flex justify-between mt-2 text-xs text-slate-400">
+                                <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Alerts -->
+                    <div class="card-gradient p-6 rounded-xl border border-slate-700">
+                        <h3 class="text-lg font-semibold mb-4">Alertas Recientes</h3>
+                        <div class="space-y-3" id="recentAlerts">
+                            <!-- Alerts will be populated by JS -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Scanner Section -->
+                <section id="scannerSection" class="section hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Scan Controls -->
+                        <div class="lg:col-span-2 card-gradient p-6 rounded-xl border border-slate-700">
+                            <h3 class="text-lg font-semibold mb-6">Escáner de Vulnerabilidades</h3>
+                            
+                            <!-- Target Input -->
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-slate-300 mb-2">Objetivo</label>
+                                <div class="flex gap-3">
+                                    <input type="text" id="scanTarget" class="flex-1 px-4 py-3 bg-slate-800 border border-slate-600 rounded-lg focus:outline-none focus:border-blue-500 text-white" placeholder="example.com o IP">
+                                    <select id="scanType" class="px-4 py-3 bg-slate-800 border border-slate-600 rounded-lg focus:outline-none focus:border-blue-500 text-white">
+                                        <option value="quick">Rápido</option>
+                                        <option value="full" selected>Completo</option>
+                                        <option value="custom">Personalizado</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Scan Options -->
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-slate-300 mb-3">Opciones de Escaneo</label>
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" checked class="w-4 h-4 rounded bg-slate-700 border-slate-600 text-blue-600">
+                                        <span class="text-sm">Puertos</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" checked class="w-4 h-4 rounded bg-slate-700 border-slate-600 text-blue-600">
+                                        <span class="text-sm">Servicios</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" checked class="w-4 h-4 rounded bg-slate-700 border-slate-600 text-blue-600">
+                                        <span class="text-sm">CMS</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" checked class="w-4 h-4 rounded bg-slate-700 border-slate-600 text-blue-600">
+                                        <span class="text-sm">SSL/TLS</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" class="w-4 h-4 rounded bg-slate-700 border-slate-600 text-blue-600">
+                                        <span class="text-sm">DNS</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" class="w-4 h-4 rounded bg-slate-700 border-slate-600 text-blue-600">
+                                        <span class="text-sm">Subdominios</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" class="w-4 h-4 rounded bg-slate-700 border-slate-600 text-blue-600">
+                                        <span class="text-sm">WAF</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" class="w-4 h-4 rounded bg-slate-700 border-slate-600 text-blue-600">
+                                        <span class="text-sm">OWASP</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Start Scan Button -->
+                            <button id="startScanBtn" class="w-full py-4 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold transition-all flex items-center justify-center gap-2">
+                                <i class="fas fa-radar"></i>
+                                Iniciar Escaneo
+                            </button>
+
+                            <!-- Scan Progress -->
+                            <div id="scanProgress" class="hidden mt-6">
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-sm text-slate-300">Escaneando...</span>
+                                    <span id="scanPercent" class="text-sm text-blue-400">0%</span>
+                                </div>
+                                <div class="w-full bg-slate-700 rounded-full h-2">
+                                    <div id="scanProgressBar" class="bg-blue-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                                </div>
+                                <p id="scanStatus" class="text-sm text-slate-400 mt-2">Inicializando...</p>
+                            </div>
+                        </div>
+
+                        <!-- Scan History -->
+                        <div class="card-gradient p-6 rounded-xl border border-slate-700">
+                            <h3 class="text-lg font-semibold mb-4">Historial de Escaneos</h3>
+                            <div class="space-y-3" id="scanHistory">
+                                <!-- History items will be populated by JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Scan Results -->
+                    <div id="scanResults" class="hidden mt-6 card-gradient p-6 rounded-xl border border-slate-700">
+                        <h3 class="text-lg font-semibold mb-4">Resultados del Escaneo</h3>
+                        <div id="vulnerabilitiesList" class="space-y-3">
+                            <!-- Results will be populated by JS -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Threats Section -->
+                <section id="threatsSection" class="section hidden">
+                    <!-- Threat Stats -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                        <div class="card-gradient p-4 rounded-xl border border-slate-700">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-red-600/20 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-radiation text-red-500"></i>
+                                </div>
+                                <div>
+                                    <p class="text-2xl font-bold" id="threatCritical">3</p>
+                                    <p class="text-xs text-slate-400">Críticos</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-gradient p-4 rounded-xl border border-slate-700">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-orange-600/20 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-exclamation-circle text-orange-500"></i>
+                                </div>
+                                <div>
+                                    <p class="text-2xl font-bold" id="threatHigh">5</p>
+                                    <p class="text-xs text-slate-400">Altos</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-gradient p-4 rounded-xl border border-slate-700">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-yellow-600/20 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-minus-circle text-yellow-500"></i>
+                                </div>
+                                <div>
+                                    <p class="text-2xl font-bold" id="threatMedium">8</p>
+                                    <p class="text-xs text-slate-400">Medios</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-gradient p-4 rounded-xl border border-slate-700">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-blue-600/20 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-info-circle text-blue-500"></i>
+                                </div>
+                                <div>
+                                    <p class="text-2xl font-bold" id="threatLow">12</p>
+                                    <p class="text-xs text-slate-400">Bajos</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Active Threats -->
+                    <div class="card-gradient p-6 rounded-xl border border-slate-700">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-semibold">Amenazas Activas</h3>
+                            <button class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-sm font-medium transition-all">
+                                <i class="fas fa-play mr-2"></i>Iniciar Respuesta
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="border-b border-slate-700">
+                                        <th class="text-left py-3 px-4 text-sm font-medium text-slate-400">Severidad</th>
+                                        <th class="text-left py-3 px-4 text-sm font-medium text-slate-400">Tipo</th>
+                                        <th class="text-left py-3 px-4 text-sm font-medium text-slate-400">Origen</th>
+                                        <th class="text-left py-3 px-4 text-sm font-medium text-slate-400">Objetivo</th>
+                                        <th class="text-left py-3 px-4 text-sm font-medium text-slate-400">Estado</th>
+                                        <th class="text-left py-3 px-4 text-sm font-medium text-slate-400">Tiempo</th>
+                                        <th class="text-left py-3 px-4 text-sm font-medium text-slate-400">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="threatsTable">
+                                    <!-- Threats will be populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Threat Map -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+                        <div class="card-gradient p-6 rounded-xl border border-slate-700">
+                            <h3 class="text-lg font-semibold mb-4">Distribución por Tipo</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm">Malware</span>
+                                        <span class="text-sm text-red-400">35%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-700 rounded-full h-2">
+                                        <div class="bg-red-500 h-2 rounded-full" style="width: 35%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm">Phishing</span>
+                                        <span class="text-sm text-orange-400">28%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-700 rounded-full h-2">
+                                        <div class="bg-orange-500 h-2 rounded-full" style="width: 28%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm">DDoS</span>
+                                        <span class="text-sm text-yellow-400">20%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-700 rounded-full h-2">
+                                        <div class="bg-yellow-500 h-2 rounded-full" style="width: 20%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm">Intrusión</span>
+                                        <span class="text-sm text-blue-400">17%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-700 rounded-full h-2">
+                                        <div class="bg-blue-500 h-2 rounded-full" style="width: 17%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-gradient p-6 rounded-xl border border-slate-700">
+                            <h3 class="text-lg font-semibold mb-4">IPs Bloqueadas Recientemente</h3>
+                            <div class="space-y-2" id="blockedIPs">
+                                <!-- Blocked IPs will be populated by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Recommendations Section -->
+                <section id="recommendationsSection" class="section hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Priority Recommendations -->
+                        <div class="card-gradient p-6 rounded-xl border border-slate-700">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="w-10 h-10 bg-red-600/20 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-exclamation-triangle text-red-500"></i>
+                                </div>
+                                <h3 class="text-lg font-semibold">Acciones Prioritarias</h3>
+                            </div>
+                            <div class="space-y-4" id="priorityRecommendations">
+                                <!-- Priority items will be populated by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Security Best Practices -->
+                        <div class="card-gradient p-6 rounded-xl border border-slate-700">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="w-10 h-10 bg-green-600/20 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-check-circle text-green-500"></i>
+                                </div>
+                                <h3 class="text-lg font-semibold">Mejores Prácticas</h3>
+                            </div>
+                            <div class="space-y-4" id="bestPractices">
+                                <!-- Best practices will be populated by JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Recommendations -->
+                    <div class="card-gradient p-6 rounded-xl border border-slate-700 mt-6">
+                        <h3 class="text-lg font-semibold mb-6">Todas las Recomendaciones</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="allRecommendations">
+                            <!-- All recommendations will be populated by JS -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Reports Section -->
+                <section id="reportsSection" class="section hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div class="card-gradient p-6 rounded-xl border border-slate-700">
+                            <div class="flex items-center justify-between mb-4">
+                                <i class="fas fa-file-pdf text-4xl text-red-500"></i>
+                                <button class="text-blue-400 hover:text-blue-300"><i class="fas fa-download"></i></button>
+                            </div>
+                            <h4 class="font-semibold">Informe Mensual</h4>
+                            <p class="text-sm text-slate-400">Diciembre 2024</p>
+                        </div>
+                        <div class="card-gradient p-6 rounded-xl border border-slate-700">
+                            <div class="flex items-center justify-between mb-4">
+                                <i class="fas fa-file-pdf text-4xl text-red-500"></i>
+                                <button class="text-blue-400 hover:text-blue-300"><i class="fas fa-download"></i></button>
+                            </div>
+                            <h4 class="font-semibold">Análisis de Vulnerabilidades</h4>
+                            <p class="text-sm text-slate-400">Q4 2024</p>
+                        </div>
+                        <div class="card-gradient p-6 rounded-xl border border-slate-700">
+                            <div class="flex items-center justify-between mb-4">
+                                <i class="fas fa-file-pdf text-4xl text-red-500"></i>
+                                <button class="text-blue-400 hover:text-blue-300"><i class="fas fa-download"></i></button>
+                            </div>
+                            <h4 class="font-semibold">Resumen de Amenazas</h4>
+                            <p class="text-sm text-slate-400">Noviembre 2024</p>
+                        </div>
+                    </div>
+
+                    <div class="card-gradient p-6 rounded-xl border border-slate-700">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-semibold">Generar Nuevo Informe</h3>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <button class="p-4 bg-slate-800 hover:bg-slate-700 rounded-lg border border-slate-600 transition-all text-left">
+                                <i class="fas fa-bug text-blue-400 text-xl mb-2"></i>
+                                <p class="font-medium">Vulnerabilidades</p>
+                                <p class="text-xs text-slate-400">Resumen de hallazgos</p>
+                            </button>
+                            <button class="p-4 bg-slate-800 hover:bg-slate-700 rounded-lg border border-slate-600 transition-all text-left">
+                                <i class="fas fa-shield-alt text-green-400 text-xl mb-2"></i>
+                                <p class="font-medium">Cumplimiento</p>
+                                <p class="text-xs text-slate-400">Estado de auditoría</p>
+                            </button>
+                            <button class="p-4 bg-slate-800 hover:bg-slate-700 rounded-lg border border-slate-600 transition-all text-left">
+                                <i class="fas fa-chart-pie text-purple-400 text-xl mb-2"></i>
+                                <p class="font-medium">Análisis Completo</p>
+                                <p class="text-xs text-slate-400">Reporte ejecutivo</p>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Settings Section -->
+                <section id="settingsSection" class="section hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="card-gradient p-6 rounded-xl border border-slate-700">
+                            <h3 class="text-lg font-semibold mb-6">Configuración de Escaneo</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="font-medium">Escaneo Automático</p>
+                                        <p class="text-sm text-slate-400">Ejecutar escaneos programados</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" checked class="sr-only peer">
+                                        <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                    </label>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="font-medium">Notificaciones Email</p>
+                                        <p class="text-sm text-slate-400">Recibir alertas por correo</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" checked class="sr-only peer">
+                                        <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                    </label>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="font-medium">Alertas en Tiempo Real</p>
+                                        <p class="text-sm text-slate-400">Notificaciones instantáneas</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" checked class="sr-only peer">
+                                        <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-gradient p-6 rounded-xl border border-slate-700">
+                            <h3 class="text-lg font-semibold mb-6">Perfil de Seguridad</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-300 mb-2">Nivel de Sensibilidad</label>
+                                    <select class="w-full px-4 py-3 bg-slate-800 border border-slate-600 rounded-lg focus:outline-none focus:border-blue-500 text-white">
+                                        <option>Conservador</option>
+                                        <option selected>Normal</option>
+                                        <option>Permisivo</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-300 mb-2">Frecuencia de Escaneo</label>
+                                    <select class="w-full px-4 py-3 bg-slate-800 border border-slate-600 rounded-lg focus:outline-none focus:border-blue-500 text-white">
+                                        <option>Diario</option>
+                                        <option selected>Semanal</option>
+                                        <option>Mensual</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-gradient p-6 rounded-xl border border-slate-700">
+                            <h3 class="text-lg font-semibold mb-6">API Keys</h3>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between p-3 bg-slate-800 rounded-lg">
+                                    <div>
+                                        <p class="font-medium">API Key Principal</p>
+                                        <p class="text-xs text-slate-400">••••••••••••••••</p>
+                                    </div>
+                                    <button class="text-blue-400 hover:text-blue-300"><i class="fas fa-copy"></i></button>
+                                </div>
+                                <button class="w-full py-2 border border-dashed border-slate-600 rounded-lg text-slate-400 hover:border-slate-500 hover:text-white transition-all">
+                                    <i class="fas fa-plus mr-2"></i>Generar Nueva Key
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="card-gradient p-6 rounded-xl border border-slate-700">
+                            <h3 class="text-lg font-semibold mb-6">Zonas Protegidas</h3>
+                            <div class="space-y-3" id="protectedZones">
+                                <!-- Zones will be populated by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        // Data inicial vacío - se carga de la API
+        let vulnerabilities = [];
+        let threats = [];
+        let alerts = [];
+        let recommendations = [];
+        let currentScanId = null;
+
+        // Login Handler con API
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const data = await CyberGuardAPI.auth.login(email, password);
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                await initApp();
+            } catch (error) {
+                alert('Credenciales incorrectas: ' + error.message);
+            }
+        });
+
+        // Check if already logged in
+        if (CyberGuardAPI.auth.isAuthenticated()) {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            initApp();
+        }
+
+        // Initialize App con datos reales de API
+        async function initApp() {
+            // Cargar dashboard stats
+            try {
+                const dashboard = await CyberGuardAPI.cyberguard.getDashboard();
+                updateDashboardStats(dashboard.stats);
+                alerts = [
+                    { type: 'info', message: 'Bienvenido a CyberGuard', time: 'Ahora' },
+                    ...(dashboard.recent_vulnerabilities || []).map(v => ({
+                        type: v.severity === 'critical' ? 'critical' : v.severity === 'high' ? 'warning' : 'info',
+                        message: `Vulnerabilidad detectada: ${v.name}`,
+                        time: 'Reciente'
+                    }))
+                ];
+            } catch (e) {
+                console.error('Error cargando dashboard:', e);
+            }
+
+            renderDashboard();
+            renderScanner();
+            await renderThreats();
+            await renderRecommendations();
+            renderSettings();
+            setupNavigation();
+            setupNotifications();
+        }
+
+        function updateDashboardStats(stats) {
+            if (stats) {
+                document.getElementById('statVulnerabilities').textContent = stats.vulnerabilities || 0;
+                document.getElementById('statThreats').textContent = stats.threats_active || 0;
+                document.getElementById('statProtected').textContent = (stats.protected_percentage || 0) + '%';
+
+                // Actualizar círculo de score
+                const circle = document.getElementById('securityCircle');
+                const score = stats.avg_score || 75;
+                const offset = 440 - (440 * score / 100);
+                circle.style.strokeDashoffset = offset;
+                circle.style.stroke = score >= 80 ? '#22c55e' : score >= 60 ? '#eab308' : '#ef4444';
+            }
+        }
+
+        // Render Dashboard
+        function renderDashboard() {
+            const alertsContainer = document.getElementById('recentAlerts');
+            if (alertsContainer) {
+                alertsContainer.innerHTML = alerts.slice(0, 5).map(alert => `
+                    <div class="flex items-center gap-3 p-3 bg-slate-800 rounded-lg">
+                        <div class="w-2 h-2 rounded-full ${
+                            alert.type === 'critical' ? 'bg-red-500' :
+                            alert.type === 'warning' ? 'bg-yellow-500' :
+                            alert.type === 'success' ? 'bg-green-500' : 'bg-blue-500'
+                        }"></div>
+                        <div class="flex-1">
+                            <p class="text-sm">${alert.message}</p>
+                            <p class="text-xs text-slate-400">${alert.time}</p>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Render Scanner
+        function renderScanner() {
+            const historyContainer = document.getElementById('scanHistory');
+            if (historyContainer) {
+                loadScanHistory();
+            }
+
+            const scanBtn = document.getElementById('startScanBtn');
+            if (scanBtn) {
+                scanBtn.addEventListener('click', startScan);
+            }
+        }
+
+        async function loadScanHistory() {
+            try {
+                const data = await CyberGuardAPI.cyberguard.getScans();
+                const historyContainer = document.getElementById('scanHistory');
+                if (historyContainer && data.scans) {
+                    historyContainer.innerHTML = data.scans.slice(0, 10).map(scan => `
+                        <div class="p-3 bg-slate-800 rounded-lg hover:bg-slate-700 cursor-pointer transition-colors" onclick="viewScan(${scan.id})">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="font-medium text-sm">${scan.target_url}</span>
+                                <span class="text-xs ${scan.score < 60 ? 'text-red-400' : 'text-green-400'}">${scan.score || 'N/A'}</span>
+                            </div>
+                            <p class="text-xs text-slate-400">${scan.status} • ${new Date(scan.created_at).toLocaleDateString()}</p>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) {
+                console.error('Error cargando historial:', e);
+            }
+        }
+
+        async function viewScan(scanId) {
+            try {
+                const data = await CyberGuardAPI.cyberguard.getScan(scanId);
+                const resultsDiv = document.getElementById('scanResults');
+                const vulnList = document.getElementById('vulnerabilitiesList');
+
+                if (resultsDiv && vulnList && data.vulnerabilities) {
+                    resultsDiv.classList.remove('hidden');
+                    vulnList.innerHTML = data.vulnerabilities.map(v => `
+                        <div class="p-4 bg-slate-800 rounded-lg border-l-4 ${
+                            v.severity === 'critical' ? 'border-red-500' :
+                            v.severity === 'high' ? 'border-orange-500' :
+                            v.severity === 'medium' ? 'border-yellow-500' : 'border-blue-500'
+                        }">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2 py-1 text-xs rounded ${
+                                        v.severity === 'critical' ? 'bg-red-500/20 text-red-400' :
+                                        v.severity === 'high' ? 'bg-orange-500/20 text-orange-400' :
+                                        v.severity === 'medium' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-blue-500/20 text-blue-400'
+                                    }">${v.severity?.toUpperCase()}</span>
+                                    <span class="font-medium">${v.name}</span>
+                                </div>
+                            </div>
+                            <p class="text-sm text-slate-400">${v.description}</p>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) {
+                console.error('Error viendo escaneo:', e);
+            }
+        }
+
+        // Start Scan con API
+        async function startScan() {
+            const target = document.getElementById('scanTarget').value || 'example.com';
+            const progressDiv = document.getElementById('scanProgress');
+            const progressBar = document.getElementById('scanProgressBar');
+            const percentText = document.getElementById('scanPercent');
+            const statusText = document.getElementById('scanStatus');
+            const resultsDiv = document.getElementById('scanResults');
+
+            progressDiv.classList.remove('hidden');
+            resultsDiv.classList.add('hidden');
+
+            try {
+                // Iniciar escaneo en backend
+                const data = await CyberGuardAPI.cyberguard.startScan(target);
+                currentScanId = data.scan.id;
+
+                statusText.textContent = 'Escaneo iniciado...';
+
+                // Simular progreso mientras el backend procesa
+                let percent = 0;
+                const interval = setInterval(async () => {
+                    percent += 10;
+                    progressBar.style.width = percent + '%';
+                    percentText.textContent = Math.round(percent) + '%';
+
+                    if (percent >= 100) {
+                        clearInterval(interval);
+                        statusText.textContent = 'Completado';
+
+                        // Mostrar resultados
+                        setTimeout(async () => {
+                            await viewScan(currentScanId);
+                            await loadScanHistory();
+                        }, 500);
+                    }
+                }, 300);
+
+            } catch (error) {
+                statusText.textContent = 'Error: ' + error.message;
+                alert('Error al iniciar escaneo: ' + error.message);
+            }
+        }
+
+        // Render Threats desde API
+        async function renderThreats() {
+            try {
+                const data = await CyberGuardAPI.cyberguard.getThreats();
+                const threatsTable = document.getElementById('threatsTable');
+
+                if (threatsTable && data.threats) {
+                    threatsTable.innerHTML = data.threats.map(threat => `
+                        <tr class="border-b border-slate-700/50 hover:bg-slate-800/50">
+                            <td class="py-3 px-4">
+                                <span class="px-2 py-1 text-xs rounded ${
+                                    threat.severity === 'critical' ? 'bg-red-500/20 text-red-400' :
+                                    threat.severity === 'high' ? 'bg-orange-500/20 text-orange-400' :
+                                    threat.severity === 'medium' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-blue-500/20 text-blue-400'
+                                }">${threat.severity?.toUpperCase()}</span>
+                            </td>
+                            <td class="py-3 px-4">${threat.type}</td>
+                            <td class="py-3 px-4 text-slate-400">${threat.source}</td>
+                            <td class="py-3 px-4">${threat.target}</td>
+                            <td class="py-3 px-4">
+                                <span class="px-2 py-1 text-xs rounded ${
+                                    threat.status === 'active' ? 'bg-red-500/20 text-red-400' :
+                                    threat.status === 'mitigated' ? 'bg-yellow-500/20 text-yellow-400' :
+                                    'bg-green-500/20 text-green-400'
+                                }">${threat.status}</span>
+                            </td>
+                            <td class="py-3 px-4 text-slate-400">${new Date(threat.detected_at).toLocaleDateString()}</td>
+                            <td class="py-3 px-4">
+                                <button onclick="mitigateThreat(${threat.id})" class="text-blue-400 hover:text-blue-300 mr-2"><i class="fas fa-check"></i></button>
+                                <button onclick="blockThreat(${threat.id})" class="text-red-400 hover:text-red-300"><i class="fas fa-ban"></i></button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (e) {
+                console.error('Error cargando amenazas:', e);
+            }
+        }
+
+        async function mitigateThreat(threatId) {
+            try {
+                await CyberGuardAPI.cyberguard.updateThreat(threatId, 'mitigated');
+                await renderThreats();
+                alert('Amenaza mitigada');
+            } catch (e) {
+                alert('Error: ' + e.message);
+            }
+        }
+
+        async function blockThreat(threatId) {
+            try {
+                await CyberGuardAPI.cyberguard.updateThreat(threatId, 'blocked');
+                await renderThreats();
+                alert('Amenaza bloqueada');
+            } catch (e) {
+                alert('Error: ' + e.message);
+            }
+        }
+
+        // Render Recommendations desde API
+        async function renderRecommendations() {
+            try {
+                const data = await CyberGuardAPI.cyberguard.getRecommendations();
+                const priorityContainer = document.getElementById('priorityRecommendations');
+                const allRecContainer = document.getElementById('allRecommendations');
+
+                if (data.recommendations) {
+                    if (priorityContainer) {
+                        priorityContainer.innerHTML = data.recommendations
+                            .filter(r => r.priority === 'high' || r.priority === 'critical')
+                            .map(rec => `
+                                <div class="p-4 bg-slate-800 rounded-lg border-l-4 ${rec.priority === 'critical' ? 'border-red-500' : 'border-yellow-500'}">
+                                    <div class="flex items-start justify-between mb-2">
+                                        <h4 class="font-medium">${rec.title}</h4>
+                                        <span class="px-2 py-1 text-xs rounded ${rec.priority === 'critical' ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400'}">${rec.priority}</span>
+                                    </div>
+                                    <p class="text-sm text-slate-400 mb-3">${rec.description}</p>
+                                    <p class="text-xs text-blue-400"><i class="fas fa-wrench mr-1"></i>${rec.action}</p>
+                                </div>
+                            `).join('');
+                    }
+
+                    if (allRecContainer) {
+                        allRecContainer.innerHTML = data.recommendations.map(rec => `
+                            <div class="p-4 bg-slate-800 rounded-lg">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="px-2 py-1 text-xs rounded ${rec.priority === 'critical' ? 'bg-red-500/20 text-red-400' : rec.priority === 'high' ? 'bg-orange-500/20 text-orange-400' : 'bg-blue-500/20 text-blue-400'}">${rec.priority}</span>
+                                </div>
+                                <h4 class="font-medium mb-1">${rec.title}</h4>
+                                <p class="text-sm text-slate-400 mb-3">${rec.description}</p>
+                                <button class="w-full py-2 bg-blue-600 hover:bg-blue-700 rounded text-sm transition-colors">Aplicar</button>
+                            </div>
+                        `).join('');
+                    }
+                }
+            } catch (e) {
+                console.error('Error cargando recomendaciones:', e);
+            }
+        }
+
+        // Render Settings
+        function renderSettings() {
+            const zonesContainer = document.getElementById('protectedZones');
+            if (zonesContainer) {
+                zonesContainer.innerHTML = `
+                    <div class="flex items-center justify-between p-3 bg-slate-800 rounded-lg">
+                        <div>
+                            <p class="font-medium">Red Principal</p>
+                            <p class="text-xs text-slate-400 font-mono">192.168.1.0/24</p>
+                        </div>
+                        <span class="px-2 py-1 text-xs rounded bg-green-500/20 text-green-400">active</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-slate-800 rounded-lg">
+                        <div>
+                            <p class="font-medium">DMZ</p>
+                            <p class="text-xs text-slate-400 font-mono">10.0.0.0/24</p>
+                        </div>
+                        <span class="px-2 py-1 text-xs rounded bg-green-500/20 text-green-400">active</span>
+                    </div>
+                `;
+            }
+        }
+
+        // Navigation
+        function setupNavigation() {
+            const navItems = document.querySelectorAll('.sidebar-item');
+            const sections = document.querySelectorAll('.section');
+
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const section = this.dataset.section;
+
+                    navItems.forEach(nav => {
+                        nav.classList.remove('active', 'text-white');
+                        nav.classList.add('text-slate-400');
+                    });
+                    this.classList.add('active', 'text-white');
+                    this.classList.remove('text-slate-400');
+
+                    sections.forEach(sec => sec.classList.add('hidden'));
+                    const sectionEl = document.getElementById(section + 'Section');
+                    if (sectionEl) sectionEl.classList.remove('hidden');
+                });
+            });
+        }
+
+        // Notifications
+        function setupNotifications() {
+            const btn = document.getElementById('notificationBtn');
+            const panel = document.getElementById('notificationsPanel');
+
+            if (btn && panel) {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    panel.classList.toggle('hidden');
+                });
+
+                document.addEventListener('click', function() {
+                    panel.classList.add('hidden');
+                });
+            }
+        }
+
+        // Legacy data
+        const vulnerabilities_legacy = [
+            { id: 1, title: 'CVE-2024-1234 - SQL Injection', severity: 'critical', status: 'open', cvss: 9.8 },
+            { id: 2, title: 'CVE-2024-5678 - XSS Reflejado', severity: 'high', status: 'open', cvss: 7.5 },
+            { id: 3, title: 'CVE-2024-9012 - CSRF Token Missing', severity: 'medium', status: 'open', cvss: 6.1 },
+            { id: 4, title: 'SSL/TLS outdated - TLS 1.0', severity: 'high', status: 'open', cvss: 7.4 },
+            { id: 5, title: 'CVE-2024-3456 - Path Traversal', severity: 'critical', status: 'open', cvss: 9.1 },
+            { id: 6, title: 'Information Disclosure - Headers', severity: 'low', status: 'open', cvss: 3.7 },
+            { id: 7, title: 'Missing HTTP Security Headers', severity: 'medium', status: 'open', cvss: 5.3 },
+            { id: 8, title: 'Weak Password Policy', severity: 'high', status: 'open', cvss: 8.2 }
+        ];
+
+        const threats = [
+            { id: 1, type: 'Malware', severity: 'critical', origin: '185.234.xx.xx', target: 'Web Server', status: 'active', time: '2 min' },
+            { id: 2, type: 'DDoS', severity: 'high', origin: '45.33.xx.xx', target: 'API Gateway', status: 'active', time: '15 min' },
+            { id: 3, type: 'Phishing', severity: 'medium', origin: '103.25.xx.xx', target: 'Mail Server', status: 'mitigated', time: '1h' },
+            { id: 4, type: 'Brute Force', severity: 'high', origin: '192.99.xx.xx', target: 'Login Portal', status: 'blocked', time: '3h' },
+            { id: 5, type: 'Port Scan', severity: 'low', origin: '104.244.xx.xx', target: 'Network', status: 'logged', time: '5h' }
+        ];
+
+        const alerts = [
+            { type: 'critical', message: 'Posible intrusión detectada en servidor web', time: '2 min' },
+            { type: 'warning', message: 'Múltiples intentos de login fallidos desde IP sospechosa', time: '15 min' },
+            { type: 'info', message: 'Escaneo completado exitosamente', time: '2h' },
+            { type: 'success', message: 'Vulnerabilidad CVE-2024-1234 parcheada', time: '5h' }
+        ];
+
+        const recommendations = [
+            { priority: 'high', title: 'Actualizar OpenSSL a versión 3.0.x', description: 'La versión actual tiene vulnerabilidades conocidas', category: 'Software' },
+            { priority: 'high', title: 'Implementar WAF', description: 'Protección contra inyecciones SQL y XSS', category: 'Infraestructura' },
+            { priority: 'medium', title: 'Habilitar 2FA', description: 'Autenticación de dos factores para admin', category: 'Acceso' },
+            { priority: 'medium', title: 'Configurar backup automático', description: 'Recuperación ante desastres', category: 'Datos' },
+            { priority: 'low', title: 'Revisar certificados SSL', description: 'Renovar certificados próximos a vencer', category: 'Certificados' }
+        ];
+
+        const bestPractices = [
+            { icon: 'fa-lock', title: 'Contraseñas Seguras', description: 'Mínimo 12 caracteres con mayúsculas, minúsculas, números y símbolos' },
+            { icon: 'fa-shield-alt', title: 'MFA Habilitado', description: 'Autenticación multifactor activa en todas las cuentas' },
+            { icon: 'fa-sync', title: 'Actualizaciones', description: 'Sistemas y aplicaciones siempre actualizados' },
+            { icon: 'fa-user-shield', title: 'Principio de Mínimo Privilegio', description: 'Usuarios con solo los permisos necesarios' }
+        ];
+
+        const scanHistory = [
+            { target: 'example.com', type: 'Completo', date: 'Hoy, 14:30', status: 'completado', issues: 5 },
+            { target: 'api.example.com', type: 'Rápido', date: 'Hoy, 10:15', status: 'completado', issues: 2 },
+            { target: '192.168.1.1', type: 'Completo', date: 'Ayer', status: 'completado', issues: 8 }
+        ];
+
+        const blockedIPs = [
+            { ip: '185.234.219.47', reason: 'Ataque DDoS', time: '5 min' },
+            { ip: '103.25.43.12', reason: 'Phishing', time: '1h' },
+            { ip: '45.33.87.23', reason: 'Brute Force', time: '3h' },
+            { ip: '192.99.178.5', reason: 'Port Scan', time: '6h' }
+        ];
+
+        const protectedZones = [
+            { name: 'Produccion', ip: '10.0.1.0/24', status: 'active' },
+            { name: 'Desarrollo', ip: '10.0.2.0/24', status: 'active' },
+            { name: 'DMZ', ip: '10.0.0.0/24', status: 'active' }
+        ];
+
+        // Login Handler
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (email === 'admin@cyberguard.com' && password === 'admin123') {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                initApp();
+            } else {
+                alert('Credenciales incorrectas. Use admin@cyberguard.com / admin123');
+            }
+        });
+
+        // Initialize App
+        function initApp() {
+            renderDashboard();
+            renderScanner();
+            renderThreats();
+            renderRecommendations();
+            renderSettings();
+            setupNavigation();
+            setupNotifications();
+        }
+
+        // Render Dashboard
+        function renderDashboard() {
+            // Recent Alerts
+            const alertsContainer = document.getElementById('recentAlerts');
+            alertsContainer.innerHTML = alerts.map(alert => `
+                <div class="flex items-center gap-3 p-3 bg-slate-800 rounded-lg">
+                    <div class="w-2 h-2 rounded-full ${
+                        alert.type === 'critical' ? 'bg-red-500' :
+                        alert.type === 'warning' ? 'bg-yellow-500' :
+                        alert.type === 'success' ? 'bg-green-500' : 'bg-blue-500'
+                    }"></div>
+                    <div class="flex-1">
+                        <p class="text-sm">${alert.message}</p>
+                        <p class="text-xs text-slate-400">${alert.time}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render Scanner
+        function renderScanner() {
+            // Scan History
+            const historyContainer = document.getElementById('scanHistory');
+            historyContainer.innerHTML = scanHistory.map(scan => `
+                <div class="p-3 bg-slate-800 rounded-lg hover:bg-slate-700 cursor-pointer transition-colors">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="font-medium text-sm">${scan.target}</span>
+                        <span class="text-xs ${scan.issues > 5 ? 'text-red-400' : 'text-green-400'}">${scan.issues} issues</span>
+                    </div>
+                    <p class="text-xs text-slate-400">${scan.type} • ${scan.date}</p>
+                </div>
+            `).join('');
+
+            // Scanner Button
+            document.getElementById('startScanBtn').addEventListener('click', startScan);
+        }
+
+        // Start Scan Simulation
+        function startScan() {
+            const target = document.getElementById('scanTarget').value || 'example.com';
+            const progressDiv = document.getElementById('scanProgress');
+            const progressBar = document.getElementById('scanProgressBar');
+            const percentText = document.getElementById('scanPercent');
+            const statusText = document.getElementById('scanStatus');
+            const resultsDiv = document.getElementById('scanResults');
+            const vulnList = document.getElementById('vulnerabilitiesList');
+
+            progressDiv.classList.remove('hidden');
+            resultsDiv.classList.add('hidden');
+
+            const scanSteps = [
+                'Inicializando escáner...',
+                'Resolviendo DNS...',
+                'Escaneando puertos...',
+                'Detectando servicios...',
+                'Analizando SSL/TLS...',
+                'Buscando vulnerabilidades...',
+                'Generando informe...',
+                'Completado'
+            ];
+
+            let percent = 0;
+            let step = 0;
+
+            const interval = setInterval(() => {
+                percent += Math.random() * 15;
+                if (percent >= 100) {
+                    percent = 100;
+                    clearInterval(interval);
+                    
+                    // Show results
+                    setTimeout(() => {
+                        resultsDiv.classList.remove('hidden');
+                        vulnList.innerHTML = vulnerabilities.map(v => `
+                            <div class="p-4 bg-slate-800 rounded-lg border-l-4 ${
+                                v.severity === 'critical' ? 'border-red-500' :
+                                v.severity === 'high' ? 'border-orange-500' :
+                                v.severity === 'medium' ? 'border-yellow-500' : 'border-blue-500'
+                            }">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center gap-2">
+                                        <span class="px-2 py-1 text-xs rounded ${
+                                            v.severity === 'critical' ? 'bg-red-500/20 text-red-400' :
+                                            v.severity === 'high' ? 'bg-orange-500/20 text-orange-400' :
+                                            v.severity === 'medium' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-blue-500/20 text-blue-400'
+                                        }">${v.severity.toUpperCase()}</span>
+                                        <span class="font-medium">${v.title}</span>
+                                    </div>
+                                    <span class="text-sm text-slate-400">CVSS: ${v.cvss}</span>
+                                </div>
+                                <div class="flex gap-2 mt-3">
+                                    <button class="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs transition-colors">Ver Detalles</button>
+                                    <button class="px-3 py-1 bg-green-600 hover:bg-green-700 rounded text-xs transition-colors">Marcarar</button>
+                                </div>
+                            </div>
+                        `).join('');
+                    }, 500);
+                }
+
+                progressBar.style.width = percent + '%';
+                percentText.textContent = Math.round(percent) + '%';
+                if (step < scanSteps.length - 1 && percent > (step + 1) * 12.5) {
+                    statusText.textContent = scanSteps[step];
+                    step++;
+                }
+                statusText.textContent = scanSteps[step];
+            }, 300);
+        }
+
+        // Render Threats
+        function renderThreats() {
+            const threatsTable = document.getElementById('threatsTable');
+            threatsTable.innerHTML = threats.map(threat => `
+                <tr class="border-b border-slate-700/50 hover:bg-slate-800/50">
+                    <td class="py-3 px-4">
+                        <span class="px-2 py-1 text-xs rounded ${
+                            threat.severity === 'critical' ? 'bg-red-500/20 text-red-400' :
+                            threat.severity === 'high' ? 'bg-orange-500/20 text-orange-400' :
+                            threat.severity === 'medium' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-blue-500/20 text-blue-400'
+                        }">${threat.severity.toUpperCase()}</span>
+                    </td>
+                    <td class="py-3 px-4">${threat.type}</td>
+                    <td class="py-3 px-4 text-slate-400">${threat.origin}</td>
+                    <td class="py-3 px-4">${threat.target}</td>
+                    <td class="py-3 px-4">
+                        <span class="px-2 py-1 text-xs rounded ${
+                            threat.status === 'active' ? 'bg-red-500/20 text-red-400' :
+                            threat.status === 'mitigated' ? 'bg-yellow-500/20 text-yellow-400' :
+                            'bg-green-500/20 text-green-400'
+                        }">${threat.status}</span>
+                    </td>
+                    <td class="py-3 px-4 text-slate-400">${threat.time}</td>
+                    <td class="py-3 px-4">
+                        <button class="text-blue-400 hover:text-blue-300 mr-2"><i class="fas fa-eye"></i></button>
+                        <button class="text-red-400 hover:text-red-300"><i class="fas fa-ban"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+
+            const blockedIPsContainer = document.getElementById('blockedIPs');
+            blockedIPsContainer.innerHTML = blockedIPs.map(ip => `
+                <div class="flex items-center justify-between p-3 bg-slate-800 rounded-lg">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-ban text-red-400"></i>
+                        <div>
+                            <p class="font-mono text-sm">${ip.ip}</p>
+                            <p class="text-xs text-slate-400">${ip.reason}</p>
+                        </div>
+                    </div>
+                    <span class="text-xs text-slate-400">${ip.time}</span>
+                </div>
+            `).join('');
+        }
+
+        // Render Recommendations
+        function renderRecommendations() {
+            const priorityContainer = document.getElementById('priorityRecommendations');
+            priorityContainer.innerHTML = recommendations.filter(r => r.priority === 'high' || r.priority === 'medium').map(rec => `
+                <div class="p-4 bg-slate-800 rounded-lg border-l-4 ${rec.priority === 'high' ? 'border-red-500' : 'border-yellow-500'}">
+                    <div class="flex items-start justify-between mb-2">
+                        <h4 class="font-medium">${rec.title}</h4>
+                        <span class="px-2 py-1 text-xs rounded ${rec.priority === 'high' ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400'}">${rec.priority}</span>
+                    </div>
+                    <p class="text-sm text-slate-400 mb-3">${rec.description}</p>
+                    <button class="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs transition-colors">Aplicar</button>
+                </div>
+            `).join('');
+
+            const practicesContainer = document.getElementById('bestPractices');
+            practicesContainer.innerHTML = bestPractices.map(practice => `
+                <div class="flex gap-3">
+                    <div class="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i class="fas ${practice.icon} text-green-400"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-medium">${practice.title}</h4>
+                        <p class="text-sm text-slate-400">${practice.description}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            const allRecContainer = document.getElementById('allRecommendations');
+            allRecContainer.innerHTML = recommendations.map(rec => `
+                <div class="p-4 bg-slate-800 rounded-lg">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="px-2 py-1 text-xs rounded ${rec.priority === 'high' ? 'bg-red-500/20 text-red-400' : rec.priority === 'medium' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-blue-500/20 text-blue-400'}">${rec.priority}</span>
+                        <span class="text-xs text-slate-400">${rec.category}</span>
+                    </div>
+                    <h4 class="font-medium mb-1">${rec.title}</h4>
+                    <p class="text-sm text-slate-400 mb-3">${rec.description}</p>
+                    <button class="w-full py-2 bg-blue-600 hover:bg-blue-700 rounded text-sm transition-colors">Implementar</button>
+                </div>
+            `).join('');
+        }
+
+        // Render Settings
+        function renderSettings() {
+            const zonesContainer = document.getElementById('protectedZones');
+            zonesContainer.innerHTML = protectedZones.map(zone => `
+                <div class="flex items-center justify-between p-3 bg-slate-800 rounded-lg">
+                    <div>
+                        <p class="font-medium">${zone.name}</p>
+                        <p class="text-xs text-slate-400 font-mono">${zone.ip}</p>
+                    </div>
+                    <span class="px-2 py-1 text-xs rounded bg-green-500/20 text-green-400">${zone.status}</span>
+                </div>
+            `).join('');
+        }
+
+        // Navigation
+        function setupNavigation() {
+            const navItems = document.querySelectorAll('.sidebar-item');
+            const sections = document.querySelectorAll('.section');
+            const pageTitles = {
+                dashboard: { title: 'Dashboard', subtitle: 'Resumen de tu seguridad' },
+                scanner: { title: 'Escáner', subtitle: 'Escaneo de vulnerabilidades' },
+                threats: { title: 'Amenazas', subtitle: 'Monitoreo de amenazas en tiempo real' },
+                recommendations: { title: 'Recomendaciones', subtitle: 'Sugerencias de seguridad' },
+                reports: { title: 'Informes', subtitle: 'Reportes y análisis' },
+                settings: { title: 'Configuración', subtitle: 'Ajustes del sistema' }
+            };
+
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const section = this.dataset.section;
+
+                    navItems.forEach(nav => {
+                        nav.classList.remove('active', 'text-white');
+                        nav.classList.add('text-slate-400');
+                    });
+                    this.classList.add('active', 'text-white');
+                    this.classList.remove('text-slate-400');
+
+                    sections.forEach(sec => sec.classList.add('hidden'));
+                    document.getElementById(section + 'Section').classList.remove('hidden');
+
+                    document.getElementById('pageTitle').textContent = pageTitles[section].title;
+                    document.getElementById('pageSubtitle').textContent = pageTitles[section].subtitle;
+                });
+            });
+        }
+
+        // Notifications
+        function setupNotifications() {
+            const btn = document.getElementById('notificationBtn');
+            const panel = document.getElementById('notificationsPanel');
+            const list = document.getElementById('notificationsList');
+
+            const notifications = [
+                { type: 'critical', title: 'Alerta de Seguridad', message: 'Posible intrusión detectada en servidor web', time: '2 min' },
+                { type: 'warning', title: 'Advertencia', message: 'Múltiples intentos de login fallidos', time: '15 min' },
+                { type: 'info', title: 'Información', message: 'Escaneo completado exitosamente', time: '2h' }
+            ];
+
+            list.innerHTML = notifications.map(n => `
+                <div class="p-4 border-b border-slate-700 hover:bg-slate-700/50 cursor-pointer">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                            n.type === 'critical' ? 'bg-red-500/20' : n.type === 'warning' ? 'bg-yellow-500/20' : 'bg-blue-500/20'
+                        }">
+                            <i class="fas ${
+                                n.type === 'critical' ? 'fa-exclamation-triangle text-red-400' : 
+                                n.type === 'warning' ? 'fa-exclamation-circle text-yellow-400' : 'fa-info-circle text-blue-400'
+                            } text-sm"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-medium text-sm">${n.title}</p>
+                            <p class="text-xs text-slate-400 mt-1">${n.message}</p>
+                            <p class="text-xs text-slate-500 mt-1">${n.time}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                panel.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', function() {
+                panel.classList.add('hidden');
+            });
+        }
+
+        // Simulate real-time updates
+        setInterval(() => {
+            const threatCount = Math.floor(Math.random() * 3) + 5;
+            document.getElementById('statThreats').textContent = threatCount;
+            document.getElementById('threatActive').textContent = threatCount;
+        }, 30000);
+    </script>
+</body>
+</html>

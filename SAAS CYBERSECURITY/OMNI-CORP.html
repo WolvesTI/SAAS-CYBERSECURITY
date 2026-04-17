@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OMNI-CORP | Enterprise Management OS</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <style>
+        /* --- THEME CONFIG FROM REFERENCE --- */
+        :root {
+            --bg-color: #050507;
+            --bg-secondary: #0f1014;
+            --bg-card: rgba(15, 16, 20, 0.7);
+            --accent-blue: #2563eb;
+            --accent-cyan: #06b6d4;
+            --accent-glow: rgba(6, 182, 212, 0.4);
+            --text-main: #ffffff;
+            --text-muted: #9ca3af;
+            --card-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow: hidden; /* App style */
+        }
+
+        h1, h2, h3, h4, .font-heading {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* Background FX */
+        .grid-bg {
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        .glow-spot {
+            background: radial-gradient(circle, rgba(37, 99, 235, 0.15) 0%, rgba(0,0,0,0) 70%);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color); 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--card-border); 
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-cyan); 
+        }
+
+        /* Utilities */
+        .glass-panel {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(6, 182, 212, 0.1), transparent);
+            border-left: 3px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+        .btn-primary:hover {
+            box-shadow: 0 0 25px var(--accent-glow);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col text-sm sm:text-base">
+
+    <!-- Background Elements -->
+    <div class="fixed inset-0 grid-bg pointer-events-none z-0"></div>
+    <div class="fixed top-[-200px] right-[-100px] w-[600px] h-[600px] glow-spot rounded-full pointer-events-none z-0"></div>
+    <div class="fixed bottom-[-200px] left-[-100px] w-[500px] h-[500px] glow-spot rounded-full pointer-events-none z-0" style="background: radial-gradient(circle, rgba(6, 182, 212, 0.1) 0%, rgba(0,0,0,0) 70%);"></div>
+
+    <!-- APP CONTAINER -->
+    <div id="app" class="relative z-10 w-full h-full flex flex-col">
+        
+        <!-- LOGIN VIEW -->
+        <div id="login-view" class="flex-1 flex items-center justify-center p-4">
+            <div class="glass-panel p-8 rounded-xl w-full max-w-md shadow-2xl animate-fade-in">
+                <div class="text-center mb-8">
+                    <div class="flex items-center justify-center gap-2 mb-2">
+                        <i class="ph-fill ph-hexagon text-3xl text-[var(--accent-cyan)]"></i>
+                        <span class="text-2xl font-bold font-heading tracking-wider">OMNI-CORP</span>
+                    </div>
+                    <p class="text-[var(--text-muted)] text-sm">Enterprise Resource Planning System</p>
+                </div>
+
+                <form id="login-form" class="space-y-6" onsubmit="handleLogin(event)">
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-[var(--text-muted)] mb-2">Usuario Corporativo</label>
+                        <div class="relative">
+                            <i class="ph ph-user absolute left-3 top-3 text-[var(--text-muted)]"></i>
+                            <input type="text" value="admin@omni.corp" class="w-full bg-[#050507] border border-[var(--card-border)] rounded-lg py-2.5 pl-10 pr-4 focus:outline-none focus:border-[var(--accent-cyan)] focus:ring-1 focus:ring-[var(--accent-cyan)] transition-colors text-white placeholder-gray-600" placeholder="user@company.com">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-[var(--text-muted)] mb-2">Contraseña</label>
+                        <div class="relative">
+                            <i class="ph ph-lock-key absolute left-3 top-3 text-[var(--text-muted)]"></i>
+                            <input type="password" value="password123" class="w-full bg-[#050507] border border-[var(--card-border)] rounded-lg py-2.5 pl-10 pr-4 focus:outline-none focus:border-[var(--accent-cyan)] focus:ring-1 focus:ring-[var(--accent-cyan)] transition-colors text-white" placeholder="••••••••">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full btn-primary text-white font-bold py-3 rounded-lg transition-transform active:scale-95 flex items-center justify-center gap-2">
+                        <span>Iniciar Sesión</span>
+                        <i class="ph-bold ph-arrow-right"></i>
+                    </button>
+                    
+                    <p class="text-center text-xs text-[var(--text-muted)] mt-4">
+                        Acceso restringido. Solo personal autorizado. <br>
+                        Monitorizado por <span class="text-[var(--accent-cyan)]">SECOPS Protocol</span>.
+                    </p>
+                </form>
+            </div>
+        </div>
+
+        <!-- DASHBOARD VIEW (Hidden by default) -->
+        <div id="dashboard-view" class="hidden h-full flex overflow-hidden">
+            
+            <!-- SIDEBAR -->
+            <aside class="w-64 glass-panel border-r border-[var(--card-border)] flex flex-col z-20 transition-all duration-300 absolute md:relative h-full -translate-x-full md:translate-x-0" id="sidebar">
+                <div class="p-6 border-b border-[var(--card-border)] flex items-center gap-3">
+                    <i class="ph-fill ph-hexagon text-2xl text-[var(--accent-cyan)]"></i>
+                    <span class="font-bold font-heading text-lg tracking-wide">OMNI-CORP</span>
+                </div>
+
+                <div class="flex-1 overflow-y-auto py-4">
+                    <div class="px-4 mb-2 text-xs uppercase text-[var(--text-muted)] font-bold tracking-widest">General</div>
+                    <nav class="space-y-1 mb-6">
+                        <button onclick="switchModule('overview')" class="nav-item w-full flex items-center gap-3 px-6 py-3 text-[var(--text-muted)] hover:text-white hover:bg-white/5 transition-all text-sm font-medium active" id="nav-overview">
+                            <i class="ph ph-squares-four text-lg"></i>
+                            Dashboard
+                        </button>
+                        <button onclick="switchModule('projects')" class="nav-item w-full flex items-center gap-3 px-6 py-3 text-[var(--text-muted)] hover:text-white hover:bg-white/5 transition-all text-sm font-medium" id="nav-projects">
+                            <i class="ph ph-kanban text-lg"></i>
+                            Proyectos
+                        </button>
+                        <button onclick="switchModule('tasks')" class="nav-item w-full flex items-center gap-3 px-6 py-3 text-[var(--text-muted)] hover:text-white hover:bg-white/5 transition-all text-sm font-medium" id="nav-tasks">
+                            <i class="ph ph-check-square text-lg"></i>
+                            Tareas
+                        </button>
+                    </nav>
+
+                    <div class="px-4 mb-2 text-xs uppercase text-[var(--text-muted)] font-bold tracking-widest">Administración</div>
+                    <nav class="space-y-1 mb-6">
+                        <button onclick="switchModule('hr')" class="nav-item w-full flex items-center gap-3 px-6 py-3 text-[var(--text-muted)] hover:text-white hover:bg-white/5 transition-all text-sm font-medium" id="nav-hr">
+                            <i class="ph ph-users text-lg"></i>
+                            Recursos Humanos
+                        </button>
+                        <button onclick="switchModule('finance')" class="nav-item w-full flex items-center gap-3 px-6 py-3 text-[var(--text-muted)] hover:text-white hover:bg-white/5 transition-all text-sm font-medium" id="nav-finance">
+                            <i class="ph ph-chart-line-up text-lg"></i>
+                            Finanzas
+                        </button>
+                        <button onclick="switchModule('inventory')" class="nav-item w-full flex items-center gap-3 px-6 py-3 text-[var(--text-muted)] hover:text-white hover:bg-white/5 transition-all text-sm font-medium" id="nav-inventory">
+                            <i class="ph ph-package text-lg"></i>
+                            Inventario
+                        </button>
+                    </nav>
+
+                    <div class="px-4 mb-2 text-xs uppercase text-[var(--text-muted)] font-bold tracking-widest">Sistemas</div>
+                    <nav class="space-y-1">
+                        <button onclick="switchModule('security')" class="nav-item w-full flex items-center gap-3 px-6 py-3 text-[var(--text-muted)] hover:text-white hover:bg-white/5 transition-all text-sm font-medium" id="nav-security">
+                            <i class="ph ph-shield-check text-lg"></i>
+                            Ciberseguridad
+                        </button>
+                        <button onclick="switchModule('settings')" class="nav-item w-full flex items-center gap-3 px-6 py-3 text-[var(--text-muted)] hover:text-white hover:bg-white/5 transition-all text-sm font-medium" id="nav-settings">
+                            <i class="ph ph-gear text-lg"></i>
+                            Configuración
+                        </button>
+                    </nav>
+                </div>
+
+                <div class="p-4 border-t border-[var(--card-border)]">
+                    <button onclick="logout()" class="w-full flex items-center justify-center gap-2 p-2 rounded hover:bg-red-500/10 hover:text-red-400 text-[var(--text-muted)] transition-colors text-sm">
+                        <i class="ph ph-sign-out"></i>
+                        Cerrar Sesión
+                    </button>
+                </div>
+            </aside>
+
+            <!-- MAIN CONTENT WRAPPER -->
+            <div class="flex-1 flex flex-col h-full overflow-hidden relative">
+                
+                <!-- TOP HEADER -->
+                <header class="h-16 glass-panel border-b border-[var(--card-border)] flex items-center justify-between px-6 z-10 shrink-0">
+                    <div class="flex items-center gap-4">
+                        <button onclick="toggleSidebar()" class="md:hidden text-[var(--text-muted)] hover:text-white">
+                            <i class="ph ph-list text-2xl"></i>
+                        </button>
+                        <h2 id="page-title" class="text-lg font-bold font-heading">Dashboard General</h2>
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                        <div class="relative hidden sm:block">
+                            <i class="ph ph-magnifying-glass absolute left-3 top-2.5 text-[var(--text-muted)]"></i>
+                            <input type="text" placeholder="Buscar..." class="bg-[var(--bg-secondary)] border border-[var(--card-border)] rounded-full py-1.5 pl-9 pr-4 text-sm focus:outline-none focus:border-[var(--accent-cyan)] transition-colors w-48">
+                        </div>
+                        
+                        <button class="relative p-2 text-[var(--text-muted)] hover:text-white transition-colors">
+                            <i class="ph ph-bell text-xl"></i>
+                            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-[var(--accent-cyan)] rounded-full animate-pulse"></span>
+                        </button>
+                        
+                        <div class="flex items-center gap-3 pl-4 border-l border-[var(--card-border)]">
+                            <div class="text-right hidden sm:block">
+                                <p class="text-xs font-bold text-white">Admin User</p>
+                                <p class="text-[10px] text-[var(--accent-cyan)]">Director General</p>
+                            </div>
+                            <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-[var(--accent-blue)] to-[var(--accent-cyan)] flex items-center justify-center text-white font-bold border border-white/20">
+                                AU
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- DYNAMIC CONTENT AREA -->
+                <main id="main-content" class="flex-1 overflow-y-auto p-6 scroll-smooth">
+                    <!-- Content injected via JS -->
+                </main>
+
+            </div>
+
+            <!-- OVERLAY FOR MOBILE SIDEBAR -->
+            <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-10 hidden md:hidden glass-panel opacity-0 transition-opacity"></div>
+
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT APP LOGIC -->
+    <script>
+        // --- STATE & DATA ---
+        const state = {
+            currentUser: null,
+            currentModule: 'overview',
+            isSidebarOpen: false
+        };
+
+        // Simulated Database
+        const db = {
+            metrics: [
+                { title: 'Ingresos Mensuales', value: '$124,500', trend: '+12%', icon: 'ph-currency-dollar', color: 'text-green-400' },
+                { title: 'Proyectos Activos', value: '14', trend: '+2', icon: 'ph-briefcase', color: 'text-blue-400' },
+                { title: 'Nuevos Empleados', value: '3', trend: 'Este mes', icon: 'ph-users', color: 'text-purple-400' },
+                { title: 'Alertas Seguridad', value: '0', trend: 'Seguro', icon: 'ph-shield-check', color: 'text-[var(--accent-cyan)]' },
+            ],
+            employees: [
+                { id: 1, name: 'Ana García', role: 'DevOps Engineer', department: 'Tecnología', status: 'Activo', email: 'ana.g@omni.corp' },
+                { id: 2, name: 'Carlos Ruíz', role: 'Gerente Ventas', department: 'Comercial', status: 'Viaje', email: 'carlos.r@omni.corp' },
+                { id: 3, name: 'Lucia Méndez', role: 'Diseñadora UX', department: 'Producto', status: 'Activo', email: 'lucia.m@omni.corp' },
+                { id: 4, name: 'Roberto Diaz', role: 'Contador', department: 'Finanzas', status: 'Licencia', email: 'roberto.d@omni.corp' },
+                { id: 5, name: 'Sofia P.', role: 'CISO', department: 'Seguridad', status: 'Activo', email: 'sofia.p@omni.corp' },
+            ],
+            finance: [
+                { id: 'TRX-9981', desc: 'Servidores AWS', amount: '-$2,400.00', date: 'Hoy', type: 'out' },
+                { id: 'TRX-9982', desc: 'Cliente Alpha Pago', amount: '+$15,000.00', date: 'Hoy', type: 'in' },
+                { id: 'TRX-9983', desc: 'Licencias Software', amount: '-$500.00', date: 'Ayer', type: 'out' },
+                { id: 'TRX-9984', desc: 'Consultoría Externa', amount: '+$4,200.00', date: 'Ayer', type: 'in' },
+            ],
+            projects: [
+                { name: 'Migración Cloud', progress: 75, status: 'En Progreso', team: 4 },
+                { name: 'App Móvil v2.0', progress: 30, status: 'Retrasado', team: 6 },
+                { name: 'Auditoría Q3', progress: 90, status: 'Revisión', team: 2 },
+                { name: 'Onboarding 2026', progress: 100, status: 'Completado', team: 3 },
+            ]
+        };
+
+        // --- AUTH LOGIC ---
+        function handleLogin(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerHTML;
+            
+            // Loading effect
+            btn.innerHTML = '<i class="ph ph-spinner animate-spin"></i> Autenticando...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                document.getElementById('login-view').classList.add('hidden');
+                document.getElementById('dashboard-view').classList.remove('hidden');
+                document.getElementById('dashboard-view').classList.add('flex');
+                
+                // Init dashboard
+                state.currentUser = { name: 'Admin', role: 'Admin' };
+                renderModule('overview');
+                
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }, 1000);
+        }
+
+        function logout() {
+            if(confirm('¿Cerrar sesión segura?')) {
+                state.currentUser = null;
+                document.getElementById('dashboard-view').classList.add('hidden');
+                document.getElementById('dashboard-view').classList.remove('flex');
+                document.getElementById('login-view').classList.remove('hidden');
+            }
+        }
+
+        // --- NAVIGATION LOGIC ---
+        function switchModule(moduleName) {
+            // Update UI State
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active', 'border-l-2', 'border-[var(--accent-cyan)]', 'bg-gradient-to-r', 'from-[var(--accent-cyan)]/10', 'to-transparent'));
+            
+            const activeNav = document.getElementById(`nav-${moduleName}`);
+            if(activeNav) {
+                activeNav.classList.add('active');
+            }
+
+            state.currentModule = moduleName;
+            
+            // Close mobile sidebar on switch
+            if (window.innerWidth < 768) {
+                toggleSidebar(false);
+            }
+
+            renderModule(moduleName);
+        }
+
+        function toggleSidebar(forceState) {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            if (forceState !== undefined) {
+                state.isSidebarOpen = forceState;
+            } else {
+                state.isSidebarOpen = !state.isSidebarOpen;
+            }
+
+            if (state.isSidebarOpen) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden', 'opacity-0');
+                overlay.classList.add('block', 'opacity-100');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.remove('block', 'opacity-100');
+                overlay.classList.add('hidden', 'opacity-0');
+            }
+        }
+
+        // --- RENDERING MODULES ---
+        function renderModule(moduleName) {
+            const container = document.getElementById('main-content');
+            const titleEl = document.getElementById('page-title');
+            
+            // Clear current content with fade effect
+            container.innerHTML = '';
+            container.classList.remove('animate-fade-in');
+            void container.offsetWidth; // trigger reflow
+            container.classList.add('animate-fade-in');
+
+            switch(moduleName) {
+                case 'overview':
+                    titleEl.innerText = 'Visión General';
+                    container.innerHTML = renderOverview();
+                    break;
+                case 'hr':
+                    titleEl.innerText = 'Recursos Humanos';
+                    container.innerHTML = renderHR();
+                    break;
+                case 'finance':
+                    titleEl.innerText = 'Finanzas Corporativas';
+                    container.innerHTML = renderFinance();
+                    break;
+                case 'projects':
+                    titleEl.innerText = 'Gestión de Proyectos';
+                    container.innerHTML = renderProjects();
+                    break;
+                case 'security':
+                    titleEl.innerText = 'Centro de Seguridad (SECOPS)';
+                    container.innerHTML = renderSecurity();
+                    break;
+                default:
+                    titleEl.innerText = 'En Desarrollo';
+                    container.innerHTML = `<div class="p-10 text-center text-[var(--text-muted)]">
+                        <i class="ph ph-cone text-4xl mb-4"></i>
+                        <p>Módulo en construcción.</p>
+                    </div>`;
+            }
+        }
+
+        // --- TEMPLATES ---
+        
+        function renderOverview() {
+            const cards = db.metrics.map(m => `
+                <div class="glass-panel p-6 rounded-xl border border-[var(--card-border)] relative overflow-hidden group hover:-translate-y-1 transition-transform">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-[var(--text-muted)] text-xs uppercase font-bold tracking-wider">${m.title}</p>
+                            <h3 class="text-2xl font-bold font-heading mt-1">${m.value}</h3>
+                        </div>
+                        <div class="p-2 bg-white/5 rounded-lg text-[var(--accent-cyan)]">
+                            <i class="ph ${m.icon} text-xl"></i>
+                        </div>
+                    </div>
+                    <p class="text-xs ${m.trend.includes('+') ? 'text-green-400' : 'text-[var(--text-muted)]'}">
+                        ${m.trend.includes('+') ? '<i class="ph-bold ph-trend-up"></i>' : ''} ${m.trend} <span class="text-gray-500">vs mes anterior</span>
+                    </p>
+                    <div class="absolute -bottom-4 -right-4 w-24 h-24 bg-gradient-to-br from-[var(--accent-cyan)] to-transparent opacity-10 rounded-full blur-xl group-hover:opacity-20 transition-opacity"></div>
+                </div>
+            `).join('');
+
+            return `
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    ${cards}
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 glass-panel p-6 rounded-xl border border-[var(--card-border)]">
+                        <h3 class="font-heading font-bold text-lg mb-6">Actividad Reciente</h3>
+                        <div class="space-y-4">
+                            <!-- Fake Graph Bars -->
+                            <div class="flex items-end gap-2 h-40 pb-2 border-b border-[var(--card-border)]">
+                                <div class="w-full bg-[var(--accent-blue)]/20 hover:bg-[var(--accent-blue)]/40 h-[40%] rounded-t transition-all"></div>
+                                <div class="w-full bg-[var(--accent-blue)]/20 hover:bg-[var(--accent-blue)]/40 h-[60%] rounded-t transition-all"></div>
+                                <div class="w-full bg-[var(--accent-blue)]/20 hover:bg-[var(--accent-blue)]/40 h-[30%] rounded-t transition-all"></div>
+                                <div class="w-full bg-[var(--accent-blue)]/20 hover:bg-[var(--accent-blue)]/40 h-[80%] rounded-t transition-all relative group">
+                                    <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-black px-2 py-1 text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity">Peak</div>
+                                </div>
+                                <div class="w-full bg-[var(--accent-blue)]/20 hover:bg-[var(--accent-blue)]/40 h-[50%] rounded-t transition-all"></div>
+                                <div class="w-full bg-[var(--accent-blue)]/20 hover:bg-[var(--accent-blue)]/40 h-[75%] rounded-t transition-all"></div>
+                                <div class="w-full bg-[var(--accent-cyan)] h-[90%] rounded-t shadow-[0_0_15px_var(--accent-glow)] relative"></div>
+                            </div>
+                            <div class="flex justify-between text-xs text-[var(--text-muted)]">
+                                <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded-xl border border-[var(--card-border)]">
+                        <h3 class="font-heading font-bold text-lg mb-4">Tareas Pendientes</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-3 p-3 bg-white/5 rounded-lg border border-[var(--card-border)]">
+                                <div class="w-5 h-5 rounded-full border-2 border-[var(--accent-cyan)] flex items-center justify-center cursor-pointer hover:bg-[var(--accent-cyan)] hover:text-white transition-colors">
+                                </div>
+                                <div class="text-sm">
+                                    <p class="font-medium">Aprobar presupuesto Q4</p>
+                                    <p class="text-xs text-[var(--text-muted)]">Vence: Hoy</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 p-3 bg-white/5 rounded-lg border border-[var(--card-border)]">
+                                <div class="w-5 h-5 rounded-full border-2 border-gray-600 flex items-center justify-center cursor-pointer">
+                                </div>
+                                <div class="text-sm">
+                                    <p class="font-medium text-[var(--text-muted)]">Revisión contratos RRHH</p>
+                                    <p class="text-xs text-[var(--text-muted)]">Vence: Mañana</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 p-3 bg-white/5 rounded-lg border border-[var(--card-border)] opacity-50">
+                                <div class="w-5 h-5 rounded-full bg-[var(--accent-blue)] flex items-center justify-center text-white text-xs">
+                                    <i class="ph-bold ph-check"></i>
+                                </div>
+                                <div class="text-sm line-through">
+                                    <p class="font-medium">Actualizar Servidor</p>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="w-full mt-4 text-xs text-[var(--accent-cyan)] hover:text-white transition-colors">+ Añadir Tarea</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderHR() {
+            const rows = db.employees.map(e => `
+                <tr class="border-b border-[var(--card-border)] hover:bg-white/5 transition-colors">
+                    <td class="py-4 px-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-gray-700 to-gray-600 flex items-center justify-center text-xs font-bold">
+                                ${e.name.substring(0,2).toUpperCase()}
+                            </div>
+                            <div>
+                                <p class="font-medium text-white">${e.name}</p>
+                                <p class="text-xs text-[var(--text-muted)]">${e.email}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="py-4 px-4 text-[var(--text-muted)]">${e.role}</td>
+                    <td class="py-4 px-4 text-[var(--text-muted)]">${e.department}</td>
+                    <td class="py-4 px-4">
+                        <span class="px-2 py-1 rounded-full text-xs border ${e.status === 'Activo' ? 'border-green-500/30 text-green-400 bg-green-500/10' : 'border-yellow-500/30 text-yellow-400 bg-yellow-500/10'}">
+                            ${e.status}
+                        </span>
+                    </td>
+                    <td class="py-4 px-4 text-right">
+                        <button class="text-[var(--text-muted)] hover:text-white p-2"><i class="ph ph-dots-three-vertical"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+
+            return `
+                <div class="glass-panel rounded-xl border border-[var(--card-border)] overflow-hidden">
+                    <div class="p-6 flex justify-between items-center border-b border-[var(--card-border)]">
+                        <h3 class="font-heading font-bold">Directorio de Personal</h3>
+                        <button class="btn-primary px-4 py-2 rounded text-sm font-medium text-white flex items-center gap-2">
+                            <i class="ph ph-plus"></i> Nuevo Empleado
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-xs text-[var(--text-muted)] uppercase bg-white/5">
+                                <tr>
+                                    <th class="py-3 px-4 font-medium">Empleado</th>
+                                    <th class="py-3 px-4 font-medium">Rol</th>
+                                    <th class="py-3 px-4 font-medium">Departamento</th>
+                                    <th class="py-3 px-4 font-medium">Estado</th>
+                                    <th class="py-3 px-4 font-medium text-right">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rows}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderFinance() {
+            const rows = db.finance.map(t => `
+                <div class="flex items-center justify-between p-4 border-b border-[var(--card-border)] hover:bg-white/5 transition-colors">
+                    <div class="flex items-center gap-4">
+                        <div class="p-3 rounded-lg ${t.type === 'in' ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}">
+                            <i class="ph ${t.type === 'in' ? 'ph-arrow-down-left' : 'ph-arrow-up-right'} text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-white">${t.desc}</p>
+                            <p class="text-xs text-[var(--text-muted)]">ID: ${t.id} • ${t.date}</p>
+                        </div>
+                    </div>
+                    <span class="font-mono font-bold ${t.type === 'in' ? 'text-green-400' : 'text-white'}">
+                        ${t.amount}
+                    </span>
+                </div>
+            `).join('');
+
+            return `
+                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Balance Card -->
+                    <div class="glass-panel p-6 rounded-xl border border-[var(--card-border)] bg-gradient-to-br from-[var(--bg-card)] to-[var(--accent-blue)]/10">
+                        <p class="text-[var(--text-muted)] text-sm mb-2">Balance Total</p>
+                        <h2 class="text-3xl font-heading font-bold text-white mb-6">$1,240,500.00</h2>
+                        <div class="flex gap-4">
+                            <div class="flex-1">
+                                <p class="text-xs text-[var(--text-muted)]">Ingresos</p>
+                                <p class="text-green-400 font-bold">+$450k</p>
+                            </div>
+                            <div class="h-10 w-px bg-[var(--card-border)]"></div>
+                            <div class="flex-1">
+                                <p class="text-xs text-[var(--text-muted)]">Gastos</p>
+                                <p class="text-red-400 font-bold">-$120k</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Transactions List -->
+                    <div class="lg:col-span-2 glass-panel rounded-xl border border-[var(--card-border)] overflow-hidden">
+                        <div class="p-4 bg-white/5 border-b border-[var(--card-border)] flex justify-between items-center">
+                            <h3 class="font-bold font-heading">Movimientos Recientes</h3>
+                            <button class="text-xs text-[var(--accent-cyan)]">Ver Todo</button>
+                        </div>
+                        <div>
+                            ${rows}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderProjects() {
+            const projects = db.projects.map(p => `
+                <div class="glass-panel p-5 rounded-xl border border-[var(--card-border)] hover:border-[var(--accent-cyan)] transition-colors group">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="bg-[var(--accent-blue)]/20 text-[var(--accent-blue)] px-2 py-1 rounded text-xs font-bold uppercase">
+                            ${p.status}
+                        </div>
+                        <button class="text-[var(--text-muted)] group-hover:text-white"><i class="ph ph-dots-three-outline"></i></button>
+                    </div>
+                    <h3 class="font-heading font-bold text-lg mb-2">${p.name}</h3>
+                    <p class="text-xs text-[var(--text-muted)] mb-4">Equipo de ${p.team} personas</p>
+                    
+                    <div class="w-full bg-gray-800 rounded-full h-2 mb-2">
+                        <div class="bg-gradient-to-r from-[var(--accent-blue)] to-[var(--accent-cyan)] h-2 rounded-full" style="width: ${p.progress}%"></div>
+                    </div>
+                    <div class="flex justify-between text-xs">
+                        <span class="text-[var(--text-muted)]">Progreso</span>
+                        <span class="font-bold text-white">${p.progress}%</span>
+                    </div>
+                </div>
+            `).join('');
+
+            return `
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex gap-2">
+                        <button class="px-4 py-2 rounded-lg bg-white/10 text-white text-sm font-medium">Activos</button>
+                        <button class="px-4 py-2 rounded-lg text-[var(--text-muted)] hover:text-white text-sm">Archivados</button>
+                    </div>
+                    <button class="btn-primary px-4 py-2 rounded text-sm font-medium text-white shadow-[0_0_15px_var(--accent-glow)]">
+                        + Nuevo Proyecto
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    ${projects}
+                    <!-- Add Card -->
+                    <button class="border border-dashed border-[var(--card-border)] rounded-xl flex flex-col items-center justify-center p-6 text-[var(--text-muted)] hover:text-[var(--accent-cyan)] hover:border-[var(--accent-cyan)] hover:bg-[var(--accent-cyan)]/5 transition-all h-full min-h-[200px]">
+                        <i class="ph ph-plus-circle text-4xl mb-2"></i>
+                        <span class="text-sm font-medium">Crear Tablero</span>
+                    </button>
+                </div>
+            `;
+        }
+
+        function renderSecurity() {
+            return `
+                <div class="flex flex-col gap-6">
+                    <!-- Security Header -->
+                    <div class="glass-panel p-8 rounded-xl border border-red-500/30 bg-gradient-to-r from-[var(--bg-card)] to-red-900/10 relative overflow-hidden">
+                        <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
+                            <div>
+                                <h2 class="text-2xl font-heading font-bold text-white mb-2 flex items-center gap-3">
+                                    <i class="ph-fill ph-shield-check text-[var(--accent-cyan)]"></i>
+                                    Estado del Sistema: <span class="text-green-400">SEGURO</span>
+                                </h2>
+                                <p class="text-[var(--text-muted)]">Último escaneo completo: Hace 14 minutos. Sin amenazas detectadas.</p>
+                            </div>
+                            <button class="btn-primary px-6 py-3 rounded font-bold text-white flex items-center gap-2">
+                                <i class="ph ph-radar"></i> Escanear Ahora
+                            </button>
+                        </div>
+                        <!-- Decorative bg -->
+                        <i class="ph ph-shield-check absolute -right-10 -bottom-10 text-9xl text-white/5 rotate-12"></i>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Console Log -->
+                        <div class="glass-panel rounded-xl border border-[var(--card-border)] flex flex-col h-96">
+                            <div class="p-4 border-b border-[var(--card-border)] bg-black/20 flex justify-between items-center">
+                                <span class="font-mono text-xs text-[var(--accent-cyan)]">Live Traffic Monitor</span>
+                                <div class="flex gap-1">
+                                    <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                                    <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
+                                    <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                                </div>
+                            </div>
+                            <div class="flex-1 bg-black/40 p-4 font-mono text-xs overflow-y-auto space-y-1 text-green-500/80">
+                                <p>[10:42:01] INBOUND TCP connection from 192.168.1.45:443 ACCEPTED</p>
+                                <p>[10:42:05] SYSTEM CHECK: Integrity verified.</p>
+                                <p>[10:42:12] AUTH: Admin user login success.</p>
+                                <p>[10:43:00] CRON: Job execution 'backup_daily' started.</p>
+                                <p class="text-yellow-500">[10:44:15] WARN: High memory usage on node-04.</p>
+                                <p>[10:45:00] API: Request to /v1/employees/list returned 200 OK.</p>
+                                <p>[10:45:22] FIREWALL: Blocked 3 attempts from known bad IP block.</p>
+                                <p class="animate-pulse">_</p>
+                            </div>
+                        </div>
+
+                        <!-- Threat Map Placeholder -->
+                        <div class="glass-panel p-6 rounded-xl border border-[var(--card-border)] flex flex-col justify-center items-center relative overflow-hidden">
+                             <h3 class="absolute top-6 left-6 font-bold text-sm uppercase text-[var(--text-muted)]">Mapa de Amenazas Global</h3>
+                             
+                             <div class="relative w-64 h-64 border border-[var(--accent-cyan)]/30 rounded-full flex items-center justify-center">
+                                <div class="absolute inset-0 bg-[var(--accent-cyan)]/5 rounded-full animate-ping opacity-20"></div>
+                                <div class="w-48 h-48 border border-[var(--accent-cyan)]/30 rounded-full flex items-center justify-center">
+                                    <div class="w-32 h-32 border border-[var(--accent-cyan)]/30 rounded-full flex items-center justify-center bg-[var(--accent-cyan)]/10">
+                                        <i class="ph-fill ph-globe text-4xl text-[var(--accent-cyan)]"></i>
+                                    </div>
+                                </div>
+                                <!-- Blips -->
+                                <div class="absolute top-10 right-10 w-2 h-2 bg-red-500 rounded-full shadow-[0_0_10px_red]"></div>
+                                <div class="absolute bottom-16 left-8 w-2 h-2 bg-yellow-500 rounded-full shadow-[0_0_10px_yellow]"></div>
+                             </div>
+                             
+                             <div class="mt-8 flex gap-8 text-xs">
+                                 <div class="text-center">
+                                     <p class="text-[var(--text-muted)]">Ataques Bloqueados</p>
+                                     <p class="text-xl font-bold text-white">1,204</p>
+                                 </div>
+                                 <div class="text-center">
+                                     <p class="text-[var(--text-muted)]">Vulnerabilidades</p>
+                                     <p class="text-xl font-bold text-white">0</p>
+                                 </div>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+    </script>
+</body>
+</html>
